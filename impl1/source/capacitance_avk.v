@@ -5,14 +5,27 @@ module avk_capacitance(
 		input neg_comparator,
 		output reference,
 		output antibounce,
-		input clock, //4MHz	
+		input clock_4mhz, 	
+		input clock_12mhz, 	
 		input reset
 		);
 
+	wire pos;
+	wire neg;
+	
+	
+	comp_buffer COMP_BUFFER(
+		.pos_comp_in(pos_comparator),
+		.neg_comp_in(neg_comparator),
+		.pos_comp_out(pos),
+		.neg_comp_out(neg),
+		.clock(clock_12mhz)
+		);
+	
 	
 	avk_antibounce AVK_ANTIBOUNCE(
-		.pos_comparator(pos_comparator),
-		.neg_comparator(neg_comparator),
+		.pos_comparator(pos),
+		.neg_comparator(neg),
 		.reference(reference),
 		.out(antibounce),
 		.reset(reset)
@@ -22,9 +35,11 @@ module avk_capacitance(
 	switch_reference SWITCH_REF	(
 		.antibounce(antibounce),
 		.reference(reference),
-		.clock(clock), //4MHz	
+		.clock(clock_4mhz), //4MHz	
 		.reset(reset)
 		);
+	
+	
 	
 endmodule
 
@@ -123,3 +138,31 @@ module switch_reference #(
 		else reference_reg <= ~reference_reg;
 		end		
 endmodule
+
+module comp_buffer(
+		input pos_comp_in,
+		input neg_comp_in,
+		output pos_comp_out,
+		output neg_comp_out,
+		input clock
+		);
+		
+	reg pos_out, pos;
+	reg neg_out, neg;
+	
+	assign 	pos_comp_out = pos_out;
+	assign 	neg_comp_out = neg_out;
+	
+	//always @(posedge clock or posedge pos_comp_in) begin
+	always @(posedge clock) begin
+		if (pos_comp_in) {pos_out, pos} <= {pos, 1'b1};
+		else {pos_out, pos} <= {pos, 1'b0} ;
+		end
+
+	//always @(posedge clock or posedge neg_comp_in) begin
+	always @(posedge clock) begin
+		if (neg_comp_in) {neg_out, neg} <= {neg, 1'b1};
+		else {neg_out, neg} <= {neg, 1'b0} ;
+		end
+
+endmodule		

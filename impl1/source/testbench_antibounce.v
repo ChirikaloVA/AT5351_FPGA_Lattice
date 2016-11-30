@@ -6,6 +6,7 @@ module testbench_antibounce();
 	//reg reference = 1'b0;
 	reg reset = 1'b0;
 	reg clock_4MHZ = 1'b0;
+	reg clock_12MHZ = 1'b0;
 	
 	wire out;
 	
@@ -130,13 +131,17 @@ module testbench_antibounce();
 	always begin
 		#0.125 clock_4MHZ <= ~clock_4MHZ;
 		end
-	
+		
+	always begin
+		#0.041 clock_12MHZ <= ~clock_12MHZ;
+		end	
 	
 	avk_capacitance AVK_CAPACITANCE(
 		.pos_comparator(pos_comp),
 		.neg_comparator(neg_comp),
 		.reference(out),
-		.clock(clock_4MHZ), //4MHz	
+		.clock_4mhz(clock_4MHZ), //4MHz	
+		.clock_12mhz(clock_12MHZ), //4MHz	
 		.reset(reset)
 		
 		);

@@ -20,7 +20,10 @@ module top(
 	pos_comparator,
 	neg_comparator,
 	ref_avk,
-	antibounce
+	antibounce,
+	pos_comparator1,
+	neg_comparator1,
+	
 	) /* synthesis GSR = "ENABLED" */	;
 
 //
@@ -30,6 +33,11 @@ module top(
 	input pos_comparator;
 	input neg_comparator;
 	output antibounce;
+	output pos_comparator1;
+	output neg_comparator1;
+	assign pos_comparator = pos_comparator1;
+	assign neg_comparator = neg_comparator1;
+
 	
 	output wire [7:0] count;
 	
@@ -132,7 +140,8 @@ module top(
 		.neg_comparator(neg_comparator),
 		.reference(ref_avk),
 		.antibounce(antibounce),
-		.clock(clk_div_6), //4MHz	
+		.clock_4mhz(clk_div_6), //4MHz	
+		.clock_12mhz(clk), //4MHz	
 		.reset(rst_sync)
 		
 		);
