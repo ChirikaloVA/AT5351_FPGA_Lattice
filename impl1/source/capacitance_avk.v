@@ -39,10 +39,21 @@ module avk_capacitance(
 		.reset(reset)
 		);
 	
+	//wire [23:0] count;
+	//counter COUNTER(
+		//.antibounce(antibounce),
+		//.reference(reference),
+		//.count(count),
+		//.clock_4mhz(clock_4mhz),
+		//.reset(reset)
+		//);
+	
 	
 	
 endmodule
 
+
+//Модуль антидребезга и "исключающего или" сигналов компараторов
 module avk_antibounce(
 		input pos_comparator,
 		input neg_comparator,
@@ -139,12 +150,14 @@ module switch_reference #(
 		end		
 endmodule
 
+
+//Модуль синхронизации сигналов компараторов с рабочей частотой ПЛИС
 module comp_buffer(
 		input pos_comp_in,
 		input neg_comp_in,
 		output pos_comp_out,
 		output neg_comp_out,
-		input clock
+		input clock			//12MHz
 		);
 		
 	reg pos_out, pos;
@@ -165,4 +178,4 @@ module comp_buffer(
 		else {neg_out, neg} <= {neg, 1'b0} ;
 		end
 
-endmodule		
+endmodule	

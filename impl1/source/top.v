@@ -24,6 +24,7 @@ module top(
 	pos_comparator1,
 	neg_comparator1,
 	
+	cnt_choise
 	) /* synthesis GSR = "ENABLED" */	;
 
 //
@@ -120,14 +121,15 @@ module top(
 		.reset(rst_sync)
 		);
 	
-	Pulse_Counter Pulse_Counter(
-		.clk(clk), 
-		.clk_div_6(clk_div_6), 
-		.trigger(counter), 
-		.reset(rst_sync),
-		.count_p(count_p), 
-		.count_m(count_m)
-		) ;
+	//Pulse_Counter Pulse_Counter(
+		//.clk(clk), 
+		//.clk_div_6(clk_div_6), 
+		//.trigger(counter), 
+		//.reset(rst_sync),
+		//.count_p(count_p), 
+		//.count_m(count_m)
+		//) ;
+
 
 
 
@@ -145,6 +147,49 @@ module top(
 		.reset(rst_sync)
 		
 		);
+
+
+	//reg cnt_choise_reg = 1'b0;
+	//reg cnt_in = 1'b0;
+	//reg cnt_en = 1'b0;
+	////assign cnt_choise = cnt_choise_reg;
+	input cnt_choise;
+	
+	
+	//always begin
+		//if (cnt_choise) begin
+			//cnt_in <= ref_avk;
+			//cnt_en <= antibounce;
+			//end
+		//else begin
+			//cnt_in <= counter;
+			//cnt_en <= 1'b1;
+			//end
+		//end
+	
+	wire cnt_in;
+	wire cnt_en;
+	count_choise COUNT_CHOISE(
+		.cnt_choise(cnt_choise),
+		.count1(counter),
+		.enable1(1'b1),
+		.count2(ref_avk),
+		.enable2(antibounce),
+		.count(cnt_in),
+		.enable(cnt_en)
+		);
+	
+	counter COUNTER(
+		.clk_12mhz(clk),
+		.clk_4mhz(clk_div_6),
+		.cnt(cnt_in),
+		.en(cnt_en),
+		.count_p(count_p),
+		.count_m(count_m),
+		
+		.reset(rst_sync)
+		);
+
 
 /*	SPI_slave SPI(
 		.clk(clk), 

@@ -2,7 +2,7 @@
 <BaliProject version="3.2" title="DKS_5351_MACHXO2_2000" device="LCMXO2-1200ZE-1TG144C" default_implementation="impl1">
     <Options/>
     <Implementation title="impl1" dir="impl1" description="impl1" synthesis="lse" default_strategy="Strategy1">
-        <Options def_top="main_ctrl" top="top"/>
+        <Options def_top="Pulse_Counter" top="top"/>
         <Source name="impl1/source/top.v" type="Verilog" type_short="Verilog">
             <Options top_module="top"/>
         </Source>
@@ -61,6 +61,9 @@
             <Options/>
         </Source>
         <Source name="impl1/tests/clk_5ms/clk_5ms.spf" type="Simulation Project File" type_short="SPF">
+            <Options/>
+        </Source>
+        <Source name="impl1/tests/Counter/Counter.spf" type="Simulation Project File" type_short="SPF">
             <Options/>
         </Source>
         <Source name="impl1/tests/post_test/post_test.spf" type="Simulation Project File" type_short="SPF">
