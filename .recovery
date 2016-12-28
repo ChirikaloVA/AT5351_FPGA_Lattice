@@ -45,6 +45,9 @@
         <Source name="impl1/source/testbench_antibounce.v" type="Verilog" type_short="Verilog" syn_sim="SimOnly">
             <Options/>
         </Source>
+        <Source name="impl1/source/testbench_spi.v" type="Verilog" type_short="Verilog" syn_sim="SimOnly">
+            <Options/>
+        </Source>
         <Source name="DKS_5351_MACHXO2_2000.lpf" type="Logic Preference" type_short="LPF">
             <Options/>
         </Source>
@@ -70,6 +73,12 @@
             <Options/>
         </Source>
         <Source name="impl1/tests/pulse_counter/pulse_counter.spf" type="Simulation Project File" type_short="SPF">
+            <Options/>
+        </Source>
+        <Source name="impl1/tests/spi/spi.spf" type="Simulation Project File" type_short="SPF">
+            <Options/>
+        </Source>
+        <Source name="impl1/tests/spi_post/spi_post.spf" type="Simulation Project File" type_short="SPF">
             <Options/>
         </Source>
         <Source name="simulation/simulation.spf" type="Simulation Project File" type_short="SPF">

@@ -1,5 +1,12 @@
 `timescale 1 ns / 1 ps
 
+//library MACHXO2;
+//use MACHXO2.components.all;
+//library ovi_machxo2;
+//use ovi_machxo2.all;
+//library pmi_work;
+//use pmi_work.all;
+
 module top(
 	clk, 
 	clk_div_6, 
@@ -12,6 +19,7 @@ module top(
 	spi_mosi, 
 	spi_miso, 
 	spi_cs, 
+	//ufm_sn,
 	rst,
 	clk_12mhz,
 	count,
@@ -36,8 +44,8 @@ module top(
 	output antibounce;
 	output pos_comparator1;
 	output neg_comparator1;
-	assign pos_comparator = pos_comparator1;
-	assign neg_comparator = neg_comparator1;
+	assign pos_comparator1 = pos_comparator;
+	assign neg_comparator1 = neg_comparator;
 
 	
 	output wire [7:0] count;
@@ -56,11 +64,13 @@ module top(
 	input wire spi_mosi; 
 	output tri spi_miso; 
 	input wire spi_cs;
+	//input wire ufm_sn;
 	input wire rst			;
 	
 	wire reset;
 	wire rst_sync;
 	assign reset = ~rst;
+	
 	PUR PUR_INST (.PUR (PURNET));
 	defparam PUR_INST.RST_PULSE = 100;	
 	GSR GSR_INST (.GSR (reset));
@@ -149,23 +159,9 @@ module top(
 		);
 
 
-	//reg cnt_choise_reg = 1'b0;
-	//reg cnt_in = 1'b0;
-	//reg cnt_en = 1'b0;
-	////assign cnt_choise = cnt_choise_reg;
+
 	input cnt_choise;
-	
-	
-	//always begin
-		//if (cnt_choise) begin
-			//cnt_in <= ref_avk;
-			//cnt_en <= antibounce;
-			//end
-		//else begin
-			//cnt_in <= counter;
-			//cnt_en <= 1'b1;
-			//end
-		//end
+
 	
 	wire cnt_in;
 	wire cnt_en;
@@ -208,28 +204,31 @@ module top(
 		//.reset(reset),
 		//.pwm(pwm)
 		//) /* synthesis syn_noprune = 1 */;
-	//wire       wb_clk_i;
-	//wire       wb_rst_i;
-	//wire       wb_cyc_i;
-	//wire       wb_stb_i;
-	//wire       wb_we_i;
-	//wire [7:0] wb_adr_i;
-	//wire [7:0] wb_dat_i;
-	//wire [7:0] wb_dat_o;
-	//wire       wb_ack_o; 
+	wire       wb_clk_i;
+	wire       wb_rst_i;
+	wire       wb_cyc_i;
+	wire       wb_stb_i;
+	wire       wb_we_i;
+	wire [7:0] wb_adr_i;
+	wire [7:0] wb_dat_i;
+	wire [7:0] wb_dat_o;
+	wire       wb_ack_o; 
 									  
-	//wire [7:0] address;                       
-	//wire       wr_en;                               
-	//wire [7:0] wr_data;                       
-	//wire       rd_en;                               
-	//wire [7:0] rd_data;                       
-	//wire       wb_xfer_done;                           
-	//wire       wb_xfer_req;
+	wire [7:0] address;                       
+	wire       wr_en;                               
+	wire [7:0] wr_data;                       
+	wire       rd_en;                               
+	wire [7:0] rd_data;                       
+	wire       wb_xfer_done;                           
+	wire       wb_xfer_req;
 	
-	//assign wb_clk_i = clk;
-	//assign wb_rst_i = rst_sync;
+	wire 	   spi_irq;
+
 	
-	//SPI  SPI (
+	assign wb_clk_i = clk;
+	assign wb_rst_i = rst_sync;
+	
+	SPI  SPI (
 		//.wb_clk_i(wb_clk_i), 
 		//.wb_rst_i(wb_rst_i), 
 		//.wb_cyc_i(wb_cyc_i), 
@@ -244,39 +243,59 @@ module top(
 		//.spi_mosi(spi_mosi), 
 		//.spi_scsn(spi_cs)
 		//);
+		
+		
+		.wb_clk_i(wb_clk_i), 
+		.wb_rst_i(wb_rst_i), 
+		.wb_cyc_i(wb_cyc_i), 
+		.wb_stb_i(wb_stb_i), 
+		.wb_we_i(wb_we_i), 
+		.wb_adr_i(wb_adr_i), 
+		.wb_dat_i(wb_dat_i), 
+		.wb_dat_o(wb_dat_o), 
+		.wb_ack_o(wb_ack_o), 
+		.spi_clk(spi_clk), 
+		.spi_miso(spi_miso), 
+		.spi_mosi(spi_mosi), 
+		.spi_scsn(spi_cs), 
+		.spi_irq(spi_irq)
+		//.ufm_sn(ufm_sn), 
+		//.wbc_ufm_irq()
+		)/* synthesis syn_noprune = 1 */;
+		
 				
 		
 
-	//wb_ctrl Wisbone_Control(
-		//.wb_clk_i(wb_clk_i), // WISHBONE clock 
-		//.wb_rst_i(wb_rst_i), // WISHBONE reset
-		//.wb_cyc_i(wb_cyc_i), // WISHBONE bus cycle
-		//.wb_stb_i(wb_stb_i), // WISHBONE strobe
-		//.wb_we_i(wb_we_i),  // WISHBONE write/read control
-		//.wb_adr_i(wb_adr_i), // WISHBONE address
-		//.wb_dat_i(wb_dat_i), // WISHBONE input data
-		//.wb_dat_o(wb_dat_o), // WISHBONE output data
-		//.wb_ack_o(wb_ack_o), // WISHBONE transfer acknowledge
-		//.address(address),  // Local address
-		//.wr_en(wr_en),    // Local write enable
-		//.wr_data(wr_data),  // Local write data
-		//.rd_en(rd_en),    // Local read enable
-		//.rd_data(rd_data),  // Local read data
-		//.xfer_done(wb_xfer_done),// WISHBONE transfer done
-		//.xfer_req(wb_xfer_req)  // WISHBONE transfer request
-		//);	
+	wb_ctrl Wisbone_Control(
+		.wb_clk_i(wb_clk_i), // WISHBONE clock 
+		.wb_rst_i(wb_rst_i), // WISHBONE reset
+		.wb_cyc_i(wb_cyc_i), // WISHBONE bus cycle
+		.wb_stb_i(wb_stb_i), // WISHBONE strobe
+		.wb_we_i(wb_we_i),  // WISHBONE write/read control
+		.wb_adr_i(wb_adr_i), // WISHBONE address
+		.wb_dat_i(wb_dat_i), // WISHBONE input data
+		.wb_dat_o(wb_dat_o), // WISHBONE output data
+		.wb_ack_o(wb_ack_o), // WISHBONE transfer acknowledge
+		.address(address),  // Local address
+		.wr_en(wr_en),    // Local write enable
+		.wr_data(wr_data),  // Local write data
+		.rd_en(rd_en),    // Local read enable
+		.rd_data(rd_data),  // Local read data
+		.xfer_done(wb_xfer_done),// WISHBONE transfer done
+		.xfer_req(wb_xfer_req)  // WISHBONE transfer request
+		);	
                                   
-   //main_ctrl main_ctrl_inst (
-                   //.clk            (clk          ),
-                   //.rst_n          (rst_sync        ),
-                   //.spi_csn        (spi_cs         ),
-                   //.address        (address      ), 
-                   //.wr_en          (wr_en        ),
-                   //.wr_data        (wr_data      ),
-                   //.rd_en          (rd_en        ),    
-                   //.rd_data        (rd_data      ),
-                   //.wb_xfer_done   (wb_xfer_done ),
-                   //.wb_xfer_req    (wb_xfer_req  ),
+   main_ctrl main_ctrl_inst (
+                   .clk            (clk          ),
+                   .rst_n          (rst_sync        ),
+                   .spi_csn        (spi_cs         ),
+                   .address        (address      ), 
+                   .wr_en          (wr_en        ),
+                   .wr_data        (wr_data      ),
+                   .rd_en          (rd_en        ),    
+                   .rd_data        (rd_data      ),
+                   .wb_xfer_done   (wb_xfer_done ),
+                   .wb_xfer_req    (wb_xfer_req  )
 
 					//.en_port(),      // Genaral purpose enable port
 					//.gpi_ld(),       // GPI latch
@@ -291,7 +310,7 @@ module top(
 					//.irq_status(),   // IRQ status     
 					//.irq_en(),       // IRQ enable
 					//.irq_clr()       // IRQ clear				   
-                   //);
+                   )/* synthesis syn_noprune = 1 */;
 	
 	
 	
@@ -308,7 +327,7 @@ module reset(
 	);
 	
 	reg reset_out, rff1;
-	assign 	sync_reset = reset_out;
+	assign 	sync_reset = ~reset_out;
 	
 	always @(posedge clk or posedge async_reset) begin
 		if (async_reset) {reset_out, rff1} <= 2'b0;
