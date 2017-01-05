@@ -8,64 +8,70 @@
 //use pmi_work.all;
 
 module top(
-	clk, 
-	clk_div_6, 
-	clk_5ms, 
-	clk_not_5ms, 
-	comparator, 
-	counter, 
-	reference, 
-	spi_clk, 
-	spi_mosi, 
-	spi_miso, 
-	spi_cs, 
+	input wire clk, 
+	output wire clk_div_6, 
+	output wire clk_5ms, 
+	output wire clk_not_5ms, 
+	input wire comparator, 
+	output wire counter, 
+	output wire reference, 
+	input wire spi_clk, 
+	input wire spi_mosi, 
+	output tri spi_miso, 
+	input wire spi_cs, 
 	//ufm_sn,
-	rst,
-	clk_12mhz,
-	count,
-	
+	input wire rst,
+	output wire clk_12mhz,
+	output wire [7:0] 	count,
+    output wire	[3:0]						input_sel,
+	output wire [2:0]						mu_sel,
+	output wire [3:0]						avk_sel,
+	output wire								ref_sel,
+	output wire								fil_sel,
+
+
 	// AVK of capacitance
-	pos_comparator,
-	neg_comparator,
-	ref_avk,
-	antibounce,
-	pos_comparator1,
-	neg_comparator1,
+	input wire pos_comparator,
+	input wire neg_comparator,
+	output wire ref_avk,
+	output wire antibounce,
+	output wire pos_comparator1,
+	output wire neg_comparator1,
 	
-	cnt_choise
+	input wire cnt_choise
 	) /* synthesis GSR = "ENABLED" */	;
 
 //
-	input wire clk;
-	output wire clk_12mhz;
+	//input wire clk;
+	//output wire clk_12mhz;
 	
-	input pos_comparator;
-	input neg_comparator;
-	output antibounce;
-	output pos_comparator1;
-	output neg_comparator1;
-	assign pos_comparator1 = pos_comparator;
-	assign neg_comparator1 = neg_comparator;
+	//input pos_comparator;
+	//input neg_comparator;
+	//output antibounce;
+	//output pos_comparator1;
+	//output neg_comparator1;
+	//assign pos_comparator1 = pos_comparator;
+	//assign neg_comparator1 = neg_comparator;
 
 	
-	output wire [7:0] count;
+	//output wire [7:0] count;
 	
 	assign clk_12mhz = clk;
 	//wire clk;
-	output wire clk_div_6;
-	output wire clk_5ms;
-	output wire clk_not_5ms;
-	input wire comparator;
-	output wire counter;
+	//output wire clk_div_6;
+	//output wire clk_5ms;
+	//output wire clk_not_5ms;
+	//input wire comparator;
+	//output wire counter;
 	//wire counter;
 	
-	output wire reference;
-	input wire spi_clk;
-	input wire spi_mosi; 
-	output tri spi_miso; 
-	input wire spi_cs;
+	//output wire reference;
+	//input wire spi_clk;
+	//input wire spi_mosi; 
+	//output tri spi_miso; 
+	//input wire spi_cs;
 	//input wire ufm_sn;
-	input wire rst			;
+	//input wire rst			;
 	
 	wire reset;
 	wire rst_sync;
@@ -121,7 +127,7 @@ module top(
 
 	wire [23:0] count_p;
 	wire [23:0] count_m;
-	assign count = ~count_p[7:0];
+	//assign count = ~count_p[7:0];
 	
 	ADC_trigger ADC_trigger(
 		.clk(clk_div_6), 
@@ -144,7 +150,7 @@ module top(
 
 
 
-	output ref_avk;
+	//output ref_avk;
 	
 
 	avk_capacitance AVK_CAPACITANCE(
@@ -160,7 +166,7 @@ module top(
 
 
 
-	input cnt_choise;
+	//input cnt_choise;
 
 	
 	wire cnt_in;
@@ -229,22 +235,6 @@ module top(
 	assign wb_rst_i = rst_sync;
 	
 	SPI  SPI (
-		//.wb_clk_i(wb_clk_i), 
-		//.wb_rst_i(wb_rst_i), 
-		//.wb_cyc_i(wb_cyc_i), 
-		//.wb_stb_i(wb_stb_i), 
-		//.wb_we_i(wb_we_i), 
-		//.wb_adr_i(wb_adr_i), 
-		//.wb_dat_i(wb_dat_i), 
-		//.wb_dat_o(wb_dat_o), 
-		//.wb_ack_o(wb_ack_o), 
-		//.spi_clk(spi_clk), 
-		//.spi_miso(spi_miso), 
-		//.spi_mosi(spi_mosi), 
-		//.spi_scsn(spi_cs)
-		//);
-		
-		
 		.wb_clk_i(wb_clk_i), 
 		.wb_rst_i(wb_rst_i), 
 		.wb_cyc_i(wb_cyc_i), 
@@ -259,8 +249,7 @@ module top(
 		.spi_mosi(spi_mosi), 
 		.spi_scsn(spi_cs), 
 		.spi_irq(spi_irq)
-		//.ufm_sn(ufm_sn), 
-		//.wbc_ufm_irq()
+
 		)/* synthesis syn_noprune = 1 */;
 		
 				
@@ -287,21 +276,27 @@ module top(
                                   
    main_ctrl main_ctrl_inst (
                    .clk            (clk          ),
-                   .rst_n          (rst_sync        ),
-                   .spi_csn        (spi_cs         ),
+                   .rst_n          (rst_sync     ),
+                   .spi_csn        (spi_cs       ),
                    .address        (address      ), 
                    .wr_en          (wr_en        ),
                    .wr_data        (wr_data      ),
                    .rd_en          (rd_en        ),    
                    .rd_data        (rd_data      ),
                    .wb_xfer_done   (wb_xfer_done ),
-                   .wb_xfer_req    (wb_xfer_req  )
+                   .wb_xfer_req    (wb_xfer_req  ),
 
+
+					.input_sel	(input_sel),
+					.mu_sel		(mu_sel),
+					.avk_sel	(avk_sel),
+					.ref_sel	(ref_sel),
+					.fil_sel	(fil_sel),
 					//.en_port(),      // Genaral purpose enable port
 					//.gpi_ld(),       // GPI latch
 					//.gpio_wr(),      // GPIO write (high) and read (low)
 					//.gpio_addr(),    // GPIO port address                     
-					//.gpio_dout(),    // GPIO port output data bus
+					.gpo_out(count[3:0])    // GPIO port output data bus
 					//.gpio_din(),     // GPIO port input data bus
 					//.mem_wr(),       // Memory write (high) and read (low)
 					//.mem_addr(),     // Memory address

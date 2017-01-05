@@ -53,7 +53,7 @@
 module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number          
                    parameter GPI_DATA_WIDTH = 8,         // GPI data width           
                    parameter GPO_PORT_NUM = 4,           // GPO port number          
-                   parameter GPO_DATA_WIDTH = 8,         // GPO data width           
+                   parameter GPO_DATA_WIDTH = 4,         // GPO data width           
                    parameter MEM_ADDR_WIDTH = 8,         // Memory addrss width      
                    parameter IRQ_NUM = 4,                // Interrupt request number 
                    parameter REVISION_ID = 8'h55,        // Revision ID             
@@ -69,12 +69,18 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     output reg                             rd_en,        // Local read enable for the WISHBONE interface          
     input  wire [7:0]                      rd_data,      // Local read data for the WISHBONE interface          
     input  wire                            wb_xfer_done, // WISHBONE transfer done    
-    input  wire                            wb_xfer_req   // WISHBONE transfer request 
+    input  wire                            wb_xfer_req,   // WISHBONE transfer request 
     //output reg                             en_port,      // Genaral purpose enable port
     //output reg                             gpi_ld,       // GPI latch
     //output reg                             gpio_wr,      // GPIO write (high) and read (low)
     //output reg  [7:0]                      gpio_addr,    // GPIO port address                     
-    //output reg  [GPO_DATA_WIDTH-1:0]       gpio_dout,    // GPIO port output data bus
+    output reg	[3:0]						input_sel,
+	output reg	[2:0]						mu_sel,
+	output reg	[3:0]						avk_sel,
+	output reg								ref_sel,
+	output reg								fil_sel,
+	
+	output wire  [GPO_DATA_WIDTH-1:0]       gpo_out    // GPIO port output data bus
     //input  wire [GPI_DATA_WIDTH-1:0]       gpio_din,     // GPIO port input data bus
     //output reg                             mem_wr,       // Memory write (high) and read (low)
     //output reg  [MEM_ADDR_WIDTH-1:0]       mem_addr,     // Memory address
@@ -84,6 +90,9 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     //output reg  [IRQ_NUM-1:0]              irq_en,       // IRQ enable
     //output reg  [IRQ_NUM-1:0]              irq_clr       // IRQ clear
     );
+    
+	
+	reg  [GPO_DATA_WIDTH-1:0]       gpio_dout;    // GPIO port output data bus
     
     // The definitions for SPI EFB register address
     `define SPITXDR 8'h59
@@ -106,31 +115,41 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     `define S_RDATA_ST  4'hC
     
     // The definitions for the SPI command values of the reference design
-    `define C_EN_SET     8'h06 
-    `define C_EN_CLR     8'h04 
-    `define C_GPO_WR     8'h01 
-    `define C_GPI_LD     8'h03 
-    `define C_GPI_RD     8'h05 
-    `define C_MEM_WR     8'h02 
-    `define C_MEM_RD     8'h0B    
-    `define C_IRQ_EN_WR  8'h66 
-    `define C_IRQ_EN_RD  8'h6A 
-    `define C_IRQ_ST     8'h65 
-    `define C_IRQ_CLR    8'h61 
+    `define C_CS_SEL      	8'h01 
+    `define C_INPUT_SEL   	8'h02  
+    `define C_MU_SEL  	 	8'h03  
+    `define C_AVK_SEL  	 	8'h04  
+    `define C_REF_SEL  	 	8'h05
+    `define C_FIL_SEL  	 	8'h06
+    //`define C_EN_CLR     8'h04 
+    //`define C_GPO_WR     8'h01 
+    //`define C_GPI_LD     8'h03 
+    //`define C_GPI_RD     8'h05 
+    //`define C_MEM_WR     8'h02 
+    //`define C_MEM_RD     8'h0B    
+    //`define C_IRQ_EN_WR  8'h66 
+    //`define C_IRQ_EN_RD  8'h6A 
+    //`define C_IRQ_ST     8'h65 
+    //`define C_IRQ_CLR    8'h61 
     `define C_REV_ID     8'h9F 
     
     // The definitions for the slim version of the SPI command values
-    `define EN_SET     4'h0  
-    `define EN_CLR     4'h1    
-    `define GPO_WR     4'h2  
-    `define GPI_LD     4'h3  
-    `define GPI_RD     4'h4  
-    `define MEM_WR     4'h5  
-    `define MEM_RD     4'h6    
-    `define IRQ_EN_WR  4'h7   
-    `define IRQ_EN_RD  4'h8
-    `define IRQ_ST     4'h9  
-    `define IRQ_CLR    4'hA  
+    `define CS_SEL     	 4'h0  
+    `define INPUT_SEL  	 4'h1  
+    `define MU_SEL  	 4'h2  
+    `define AVK_SEL  	 4'h3  
+    `define REF_SEL  	 4'h4 
+	`define FIL_SEL  	 4'h5
+    //`define EN_CLR     4'h1    
+    //`define GPO_WR     4'h2  
+    //`define GPI_LD     4'h3  
+    //`define GPI_RD     4'h4  
+    //`define MEM_WR     4'h5  
+    //`define MEM_RD     4'h6    
+    //`define IRQ_EN_WR  4'h7   
+    //`define IRQ_EN_RD  4'h8
+    //`define IRQ_ST     4'h9  
+    //`define IRQ_CLR    4'hA  
     `define REV_ID     4'hB  
     `define INVALID    4'hF  
         
@@ -147,9 +166,11 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     wire       spi_rx_rdy;        // SPI receive ready    
     wire       spi_tx_rdy;        // SPI transmit ready             
     wire       spi_xfer_done;     // SPI transmitting complete (1: complete, 0: in progress) 
-    reg  [7:0] mem_burst_cnt;
+    //reg  [7:0] mem_burst_cnt;
 
-            
+	reg [3:0] 	spi_byte_counter;	
+	assign gpo_out[3:0] = spi_csn_buf0_p ? gpio_dout[3:0] : 4'hF;
+
     // Bufferring spi_csn with postive edge                    
     always @(posedge clk or posedge rst_n)
        if (rst_n)
@@ -214,11 +235,16 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           //irq_clr <= 'b0;
           //gpio_wr <= 1'b0;  
           //gpio_addr <= 8'd0;
-          //gpio_dout <= 'b0;
+		  input_sel <= 4'b0;
+		  mu_sel <= 3'b0;
+		  avk_sel <= 4'b0;
+		  ref_sel <= 1'b0;
+		  fil_sel <= 1'b0;		  
+          gpio_dout <= 'b0;
           //mem_wr <= 1'b0;
           //mem_addr <= 'b0;
           //mem_wdata <= 'b0;
-          mem_burst_cnt <= 'b0;
+          //mem_burst_cnt <= 'b0;
        end else begin
           rd_en <= 1'b0;
           wr_en <= 1'b0;
@@ -241,6 +267,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                           main_sm <= `S_TXDR_WR;            // Go to `S_TXDR_WR state when the RXDR register read is done
                           wr_en <= 1'b1; 
                           address <= `SPITXDR; 
+						  wr_data <= 8'd0;
                        end
           // Write dummy data to the SPI EFB TXDR register in order to write next data to the register correctly       
           `S_TXDR_WR:  if (wb_xfer_done) begin                
@@ -269,6 +296,12 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           `S_CMD_LD:   if (wb_xfer_done) begin
                           main_sm <= `S_CMD_DEC;            // Go to `S_CMD_DEC state when the RXDR register read is done
                           case (rd_data)
+						  `C_CS_SEL:	 spi_cmd <= `CS_SEL;
+                          `C_INPUT_SEL:	 spi_cmd <= `INPUT_SEL;
+                          `C_MU_SEL:	 spi_cmd <= `MU_SEL;
+                          `C_AVK_SEL:	 spi_cmd <= `AVK_SEL;
+                          `C_REF_SEL:	 spi_cmd <= `REF_SEL;
+                          `C_FIL_SEL:	 spi_cmd <= `FIL_SEL;
                           //`C_EN_SET:     spi_cmd <= `EN_SET;   
                           //`C_EN_CLR:     spi_cmd <= `EN_CLR;  
                           //`C_GPO_WR:     spi_cmd <= `GPO_WR;  
@@ -287,6 +320,37 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           // Decode the SPI command              
           `S_CMD_DEC:  begin
                           case (spi_cmd)
+                          `CS_SEL:     begin 
+                                          main_sm <= `S_TXDR_WR1;     // Go to `S_IDLE state when the SPI command is Enable
+										  wr_en <= 1'b1; 
+                                          address <= `SPITXDR; 
+										  //wr_data <= 8'hFF;
+                                       end  
+                          `INPUT_SEL:     begin 
+                                          main_sm <= `S_TXDR_WR1;     // Go to `S_IDLE state when the SPI command is Enable
+										  wr_en <= 1'b1; 
+                                          address <= `SPITXDR; 
+                                       end 									   
+                          `MU_SEL:     begin 
+                                          main_sm <= `S_TXDR_WR1;     // Go to `S_IDLE state when the SPI command is Enable
+										  wr_en <= 1'b1; 
+                                          address <= `SPITXDR; 
+                                       end 									   
+                          `AVK_SEL:     begin 
+                                          main_sm <= `S_TXDR_WR1;     // Go to `S_IDLE state when the SPI command is Enable
+										  wr_en <= 1'b1; 
+                                          address <= `SPITXDR; 
+                                       end 									   
+                          `REF_SEL:     begin 
+                                          main_sm <= `S_TXDR_WR1;     // Go to `S_IDLE state when the SPI command is Enable
+										  wr_en <= 1'b1; 
+                                          address <= `SPITXDR; 
+                                       end 									   
+                          `FIL_SEL:     begin 
+                                          main_sm <= `S_TXDR_WR1;     // Go to `S_IDLE state when the SPI command is Enable
+										  wr_en <= 1'b1; 
+                                          address <= `SPITXDR; 
+                                       end 									   
                           //`EN_SET:     begin 
                                           //main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Enable
                                           //en_port <= 1'b1; 
@@ -371,7 +435,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           // For IRQ_ST/REV_ID commands, wait for the data write done             
           `S_ADDR_ST:  begin 
                           if (wb_xfer_done && spi_rx_rdy) begin
-                              main_sm <= `S_ADDR_LD;           // Go to `S_ADDR_LD state when the address is ready in the RXDR register
+                              main_sm <= `S_DATA_WR;           // Go to `S_ADDR_LD state when the address is ready in the RXDR register
                               rd_en <= 1'b1;                        
                               address <= `SPIRXDR;
                               
@@ -385,6 +449,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                              main_sm <= `S_TXDR_WR1;           // Go to `S_TXDR_WR1 state to rewrite the TXDR register when SPI transmit is ready
                              wr_en <= 1'b1; 
                              address <= `SPITXDR; 
+							 //wr_data <= 8'd0;
                           end else if (wb_xfer_done) begin
                              rd_en <= 1'b1;                    // Otherwise, keep read SR register in the current state
                              address <= `SPISR;
@@ -394,6 +459,13 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           // For IRQ_ST/REV_ID commands, go to `S_IDLE state.                
           `S_ADDR_LD:  if (wb_xfer_done) begin
                           case (spi_cmd) 
+						  `CS_SEL:     begin 
+                                          main_sm <= `S_WDATA_ST; // Go to `S_WDATA_ST state when the SPI command is Write GPO
+                                          //gpio_addr <= rd_data;
+                                          rd_en <= 1'b1; 
+                                          address <= `SPISR; 
+                                       end
+									   
                           //`GPO_WR:     begin 
                                           //main_sm <= `S_WDATA_ST; // Go to `S_WDATA_ST state when the SPI command is Write GPO
                                           //gpio_addr <= rd_data;
@@ -424,17 +496,17 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                           endcase
                        end
           // Wait for the SPI write data ready in the RXDR register       
-          //`S_WDATA_ST: begin
-                          //if (wb_xfer_done && spi_rx_rdy) begin
-                             //main_sm <= `S_DATA_WR;            // Go to `S_DATA_WR state when the SPI write data is ready in the RXDR register
-                             //rd_en <= 1'b1;                        
-                             //address <= `SPIRXDR;
-                          //end else if (wb_xfer_done && spi_xfer_done)   
-                             //main_sm <= `S_IDLE;               // Go to `S_IDLE state when the SPI transfer is complete
-                          //else if (wb_xfer_done) begin
-                             //rd_en <= 1'b1;                    // Otherwise, keep read SR register in the current state
-                             //address <= `SPISR;
-                          //end  
+          `S_WDATA_ST: begin
+                          if (wb_xfer_done && spi_rx_rdy) begin
+                             main_sm <= `S_DATA_WR;            // Go to `S_DATA_WR state when the SPI write data is ready in the RXDR register
+                             rd_en <= 1'b1;                        
+                             address <= `SPIRXDR;
+                          end else if (wb_xfer_done && spi_xfer_done)   
+                             main_sm <= `S_IDLE;               // Go to `S_IDLE state when the SPI transfer is complete
+                          else if (wb_xfer_done) begin
+                             rd_en <= 1'b1;                    // Otherwise, keep read SR register in the current state
+                             address <= `SPISR;
+                          end  
                  
                           //if (mem_wr) begin
                              //mem_addr <= mem_addr + 8'b1;
@@ -442,10 +514,34 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                              //if (mem_burst_cnt !== MAX_MEM_BURST_NUM)
                                 //mem_burst_cnt <= mem_burst_cnt + 8'b1;
                           //end      
-                       //end
+                       end
           // Load SPI data                             
-          //`S_DATA_WR:  if (wb_xfer_done) begin
-                          //case (spi_cmd) 
+          `S_DATA_WR:  if (wb_xfer_done) begin
+                          case (spi_cmd) 
+                          `CS_SEL:     begin 
+                                          main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
+                                          gpio_dout <= rd_data[GPO_DATA_WIDTH-1:0]; 
+                                       end	
+                          `INPUT_SEL:     begin 
+                                          main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
+                                          input_sel <= rd_data[3:0]; 
+                                       end	
+                          `MU_SEL:     begin 
+                                          main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
+                                          mu_sel <= rd_data[2:0]; 
+                                       end	
+                          `AVK_SEL:     begin 
+                                          main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
+                                          avk_sel <= rd_data[3:0]; 
+                                       end	
+                          `REF_SEL:     begin 
+                                          main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
+                                          ref_sel <= rd_data[0:0]; 
+                                       end	
+                          `FIL_SEL:     begin 
+                                          main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
+                                          fil_sel <= rd_data[0:0]; 
+                                       end										   
                           //`GPI_LD:     begin 
                                           //main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Latch GPI
                                           //gpi_ld <= rd_data[0]; 
@@ -483,8 +579,8 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                                           //else
                                              //mem_wr <= 1'b0;   
                                        //end 
-                          //endcase
-                       //end
+                          endcase
+                       end
           // Write the SPI read data to the TXDR register    
           //`S_DATA_RD:  begin
                           //if (wb_xfer_done && spi_tx_rdy) begin

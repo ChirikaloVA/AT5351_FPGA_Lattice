@@ -26,7 +26,8 @@ module testbench_spi();
 	wire spi_miso;
 	reg [7:0] spi_divider;
 	reg [7:0] spi_clk_counter;
-	reg [7:0] buffer;
+	reg [7:0] buffer0;
+	reg [7:0] buffer1;
 	reg ufm_sn;
 
 
@@ -44,7 +45,8 @@ module testbench_spi();
 		//spi_miso <= 1'b1;
 		spi_divider <= 8'd0;
 		spi_clk_counter <= 8'd0;
-		buffer <= 8'hF9;
+		buffer0 <= 8'h01;	//0x01
+		buffer1 <= 8'h01;	//0x05	  	
 		
 		$display("Running 'spi' testbench");
 		//#350 reset <= 1'b1;  
@@ -55,7 +57,7 @@ module testbench_spi();
 		//#1240000 trigger = 1'b0;
 
 
-		#40000 $stop;
+		#200000 $stop;
 		$display("'spi' testbench stopped");
 		end
 
@@ -74,31 +76,74 @@ module testbench_spi();
 	
 	always  begin
 		#(4000) spi_cs <= 1'b0;
-		#(20000) spi_cs <= 1'b1;
-		end	
+		#(20000) spi_cs <= 1'b1;  
+		buffer1 <= buffer1 + 8'b1;	   
+		if (buffer1 == 8'hF) begin 
+			buffer0 <= buffer0 + 8'b1;
+			buffer1 <= 8'b0; 
+		end
+	end	
 		
-		
+	reg [4:0] i = 0;
+	
 	always @(posedge clk_12mhz or negedge spi_cs) begin
 		if (!spi_cs) begin
-			if (spi_divider >= SPI_SPEED) begin
-				if (spi_clk_counter >= 24 && !spi_clk) #5 spi_divider <= 0 ;
-				else begin
-					#5 spi_divider <= 0;
-					#5 spi_clk <= ~spi_clk;
-					if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 1;
+			if (spi_divider >= SPI_SPEED) begin	 
+				if (i==0) begin
+					if (spi_clk_counter == 8 && !spi_clk) begin
+						#5 spi_divider <= 0 ;
+						#1000 	  spi_clk_counter <= 0;	 
+						i <= 1;
+					end	
+					else begin
+						#5 spi_divider <= 0;
+						#105 spi_clk <= ~spi_clk;
+						if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
 					end
 				end
+				else if (i==1) begin  
+					if (spi_clk_counter == 8 && !spi_clk) begin
+						#5 spi_divider <= 0 ;
+						#1000 	  spi_clk_counter <= 0;	 
+						i <= 2;
+					end	
+					else begin
+						#5 spi_divider <= 0;
+						#105 spi_clk <= ~spi_clk;
+						if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
+					end
+				end
+				else if (i==2) begin  
+					if (spi_clk_counter == 8 && !spi_clk) begin
+						#5 spi_divider <= 0 ;
+						i <= 0;
+					end	
+					else begin
+						#5 spi_divider <= 0;
+						#105 spi_clk <= ~spi_clk;
+						if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
+					end
+				end				
+		
+			end					   
+					
+					
 			else #5 spi_divider <= spi_divider + 1;
 			end
 		else begin 
 			spi_clk <= 1'b0;
 			spi_divider <= 8'd0;
-			spi_clk_counter <= 8'd0;
-			end
-		end
-	
-	always @(posedge spi_clk) begin
-		spi_mosi <= buffer>>spi_clk_counter;
+			spi_clk_counter <= 8'd0;  
+			i <= 5'd0;  
+			
+		end	 
+		
+	end	 
+		
+		
+	always @(posedge spi_clk) begin	 
+		if (i==0) spi_mosi <= buffer0>>(8'd7 - spi_clk_counter);
+		else if (i==1)	spi_mosi <= buffer1>>(8'd7 - spi_clk_counter);
 		end
 
 
@@ -115,11 +160,17 @@ module testbench_spi();
 		.spi_mosi(spi_mosi_wire), 
 		.spi_miso(spi_miso), 
 		.spi_cs(spi_cs_wire),
-		.ufm_sn(ufm_sn),
+		//.ufm_sn(ufm_sn),
 		.rst(~reset),
 		.clk_12mhz(),
 		.count(),
 		
+		
+		.input_sel	(),
+		.mu_sel		(),
+		.avk_sel	(),
+		.ref_sel	(),
+		.fil_sel	(),
 		// AVK of capacitance
 		.pos_comparator(),
 		.neg_comparator(),
