@@ -87,12 +87,9 @@ reportview.xml
 simulation.asdb
 simulation.awc
 SPI.edn
-SPI.ipx
 SPI.lpc
 SPI.srp
-SPI.v
 SPI_generate.log
-SPI_tmpl.v
 /testbench.v
 doxygen/
 *.log
