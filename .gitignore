@@ -96,3 +96,6 @@ SPI_tmpl.v
 /testbench.v
 doxygen/
 *.log
+*.edn
+*.lpc
+*.srp
