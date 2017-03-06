@@ -94,3 +94,5 @@ SPI.v
 SPI_generate.log
 SPI_tmpl.v
 /testbench.v
+doxygen/
+*.log

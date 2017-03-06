@@ -1,170 +1,78 @@
+/**
+ * В данном файле находятся модули 
+ * -ADC_trigger(..)
+ * -counter(..)
+ * -count_choise(..)
+ * 
+ */
 `timescale 1 ns / 1 ps
 
 
+/**
+ * @brief Триггер АЦП		 
+ * @details Модуль представляет собой обычный триггер, который
+ *          синхронизирует входной сигнал после компаратора АЦП с тактовой
+ *          частотой и на выходе выдает сигнал управления опорой, а также 
+ * 	        сигнал для счета импульсов
+ * 
+ * @param clk 	тактовая частота (4МГц)
+ * @param d 	вход триггера, подключается к выходу компаратора АЦП
+ * @param q 	выход триггера, который заводится на вход 
+ *              счетчика counter(..)
+ * @param n_q 	инвертированный выход триггера, является сигналом 
+ *              для переключения направления опорного тока на обратный
+ * @param reset	вход асинхронного сброса
+ */
 module ADC_trigger(
-	input wire clk,
-	input wire d,
-	output wire q,
-	output wire n_q,
-	input wire reset
-	);
+		input wire clk,
+		input wire d,
+		output wire q,
+		output wire n_q,
+		input wire reset
+		);
 	
-	//reg buffer;
-	
-	//wire q_1;
-	//assign q_1 = buffer;
-	
-	//reg buffer_out;
-	//assign n_q = ~q;
-	//assign q = buffer_out;
-	
-	//reg reset_sync;
-	
-	//always @(posedge clk_12MHz) begin
-		//reset_sync <= reset;
-		//end
-		
-	//always @(posedge clk) begin
-		//if (reset_sync) begin 
-			//buffer <= 1'b0;
-			//end
-		//else begin
-			///*if (d) buffer <= 1'b1;
-			//else buffer <= 1'b0; */
-			//buffer <= d;
-			//end	
-		//end
-		
-	//always @(posedge clk_12MHz) begin
-		//if (q_1) buffer_out <= 1'b1;
-		//else buffer_out <= 1'b0;
-		//end
-
 	reg buffer = 1'b0;
-
 	assign n_q = ~q;
 	assign q = buffer;
-	
 
-		
-	//always @(clk) begin
-		//if (reset_sync) clock <= clk_12MHz;
-		//else clock <= clk;	
-	//end
-	
 	always @(posedge clk or posedge reset) begin
-		if (reset) begin
-			buffer <= 1'b0;
-			
-		end
-		else begin
-
-			buffer <= d;
-		end	
+		if (reset) buffer <= 1'b0;
+		else buffer <= d;
 	end
 
-
 endmodule
 
 
-module Pulse_Counter(
-		input wire clk, 
-		input wire clk_div_6, 
-		input wire trigger,
-		input wire reset,
-		output reg [23:0] count_p, 
-		output reg [23:0] count_m
-		);
-
-	reg [23:0] p = 24'd0;
-	reg [23:0] m = 24'd0;
-	
-	//initial begin
-		//count_p = 24'b0;
-		//count_m = 24'b0;
-		//end
-		
-		
-	//reg reset_local = 1'b0;  
-	//always @(posedge clk) 
-		//if (reset) reset_local<= 1'b1;
-		//else reset_local <= 1'b0;
-	
-	reg [2:0] trigger_sync = 3'd0;  
-	always @(posedge clk) trigger_sync <= {trigger_sync[1:0], trigger};
-	wire trigger_risingedge = (trigger_sync[2:1]==2'b01);  // now we can detect trigger rising edges
-	wire trigger_fallingedge = (trigger_sync[2:1]==2'b10);  // and falling edges
-	
-	always @(posedge clk_div_6 or posedge reset) begin
-		if (reset) begin
-			p <= 24'd0;
-			m <= 24'd0;
-			end
-		else begin
-			if (trigger) begin
-				m <=0 ;
-				p <= p + 24'b1;
-				end
-			else begin
-				p <=0 ;
-				m <= m + 24'b1;
-				end
-			//if (clk_div_6)
-				//if (trigger) p <= p + 24'b1;
-				//else m <= m + 24'b1;
-			//if (trigger_risingedge) begin
-				//p <= 24'b0;
-				//count_m <= m;
-				//count_p <= p;
-				//end
-			//if (trigger_fallingedge) m <= 24'b0;
-			end
-
-			
-		end
-		
-		
-	always @(posedge clk or posedge reset) begin
-		if (reset) count_m <= 24'b0;
-		else begin 
-			if (trigger_risingedge) count_m <= m;
-			end
-		end
-		
-		
-	always @(posedge clk or posedge reset) begin
-		if (reset) count_p <= 24'b0;
-		else begin
-			if (trigger_fallingedge) count_p <= p;
-			end
-		end
-endmodule
-	
-	
-	
-	
-
-//Модуль счета длительности импульсов
+/**
+ * @brief Счетчик импульсов		 
+ * @details Счетчик считает длительность высокого и низкого уровня сигнала cnt
+ *          при разрешающем сигнале en. Тактовая частота, с которой считается длительность -
+ *          4МГц, рабочая частота логики - 12МГц. Результат подсчета сохнаняется в два
+ *          24-х разрядных регистра count_p и count_m.
+ * 
+ * @param  clk_12mhz 		входная тактовая частота 12 МГц для работы логики
+ * @param  clk_4mhz  		входная тактовая частота 12 МГц для счета импульсов
+ * @param  cnt       		сигнал, длительность которого необходимо считать
+ * @param  en        		вход разрешения счета
+ * @param  [23:0]count_p 	счет+
+ * @param  [23:0]count_m	счет-
+ * @param  reset     		асинхронный сброс
+ */
 module counter(
-		input clk_12mhz,
-		input clk_4mhz,
-		input cnt,
-		input en,
-		//input cnt_choise,
-		output [23:0] count_p,
-		output [23:0] count_m,
-		
-		input reset
+		input wire clk_12mhz,
+		input wire clk_4mhz,
+		input wire cnt,
+		input wire en,
+		output wire [23:0] count_p,
+		output wire [23:0] count_m,
+		input wire reset
 		);
-		
-		
-	
 		
 	//Определение напраление изменения уровня сигнала (фронт или спад)
 	reg [2:0] cnt_sync = 3'd0;  
 	always @(posedge clk_12mhz) cnt_sync <= {cnt_sync[1:0], cnt};
-	wire cnt_risingedge = (cnt_sync[2:1]==2'b01);  // now we can detect count rising edges
-	wire cnt_fallingedge = (cnt_sync[2:1]==2'b10);  // and falling edges
+	wire cnt_risingedge = (cnt_sync[2:1]==2'b01);  // сейчас мы можем детектировать фронты
+	wire cnt_fallingedge = (cnt_sync[2:1]==2'b10);  // и спады
 	
 	//Регистры счетчика
 	reg [23:0] p = 24'd0;
@@ -194,12 +102,8 @@ module counter(
 				//содержимого счетчика
 				if (cnt_sync == 3'b111) m <=0 ;
 				if (cnt_sync == 3'b000) p <=0 ;
-					
-
 				end
-
 			end
-			
 		end
 
 	//Сохранение значение счетчика низкого уровня входного сигнала
@@ -221,20 +125,31 @@ module counter(
 endmodule
 
 
-//Модуль выбора сигнала на вход счетчика
+/**
+ * @brief Модуль выбора сигнала на вход счетчика	 
+ * @details Мультиплексор для входа счетчика counter. С помощью сигнала 
+ *          cnt_choise выбирается канал 1 или 2 и подключаются к выходу.
+ *
+ * @param  cnt_choise    Сигнал выбора входа
+ * @param  count1        Сигнал для измерения канал 1
+ * @param  enable1       Сигнал разрешения измерения канал 1
+ * @param  count2        Сигнал для измерения канал 2
+ * @param  enable2       Сигнал разрешения измерения канал 1
+ * @param  count         Сигнал для измерения выход
+ * @param  enable        Сигнал разрешения измерения выход
+ */
 module count_choise(
-		input cnt_choise,
-		input count1,
-		input enable1,
-		input count2,
-		input enable2,
-		output count,
-		output enable
+		input wire cnt_choise,
+		input wire count1,
+		input wire enable1,
+		input wire count2,
+		input wire enable2,
+		output wire count,
+		output wire enable
 		);
 		
 	reg cnt_in = 1'b0;
 	reg cnt_en = 1'b0;
-	//assign cnt_choise = cnt_choise_reg;
 	assign count = cnt_in;
 	assign enable = cnt_en;
 	
@@ -243,7 +158,6 @@ module count_choise(
 		cnt_en = 1'b0;
 		end
 		
-	
 	always @(*) begin
 		if (cnt_choise) begin
 			cnt_in = count2;

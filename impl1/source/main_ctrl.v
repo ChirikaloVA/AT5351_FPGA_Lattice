@@ -78,9 +78,11 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
 	output reg	[2:0]						mu_sel,
 	output reg	[3:0]						avk_sel,
 	output reg								ref_sel,
-	output reg								fil_sel,
+	output reg								fil1_sel,
+	output reg								fil2_sel,
+	output wire 							relay_reset,
 	
-	output wire  [GPO_DATA_WIDTH-1:0]       gpo_out    // GPIO port output data bus
+	output wire  [GPO_DATA_WIDTH-1:0]       cs_out    // GPIO port output data bus
     //input  wire [GPI_DATA_WIDTH-1:0]       gpio_din,     // GPIO port input data bus
     //output reg                             mem_wr,       // Memory write (high) and read (low)
     //output reg  [MEM_ADDR_WIDTH-1:0]       mem_addr,     // Memory address
@@ -92,7 +94,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     );
     
 	
-	reg  [GPO_DATA_WIDTH-1:0]       gpio_dout;    // GPIO port output data bus
+	reg  [GPO_DATA_WIDTH-1:0]       cs_dout;    // GPIO port output data bus
     
     // The definitions for SPI EFB register address
     `define SPITXDR 8'h59
@@ -169,7 +171,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     //reg  [7:0] mem_burst_cnt;
 
 	reg [3:0] 	spi_byte_counter;	
-	assign gpo_out[3:0] = spi_csn_buf0_p ? gpio_dout[3:0] : 4'hF;
+	assign cs_out[3:0] = spi_csn_buf0_p ? cs_dout[3:0] : 4'hF;
 
     // Bufferring spi_csn with postive edge                    
     always @(posedge clk or posedge rst_n)
@@ -235,13 +237,16 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           //irq_clr <= 'b0;
           //gpio_wr <= 1'b0;  
           //gpio_addr <= 8'd0;
+		  
 		  input_sel <= 4'b0;
 		  mu_sel <= 3'b0;
-		  avk_sel <= 4'b0;
+		  //avk_sel <= 4'b0;
 		  ref_sel <= 1'b0;
-		  fil_sel <= 1'b0;		  
-          gpio_dout <= 'b0;
-          //mem_wr <= 1'b0;
+		  fil1_sel <= 1'b0;		  
+          fil2_sel <= 1'b0;		  
+          cs_dout <= 4'b0;
+          
+		  //mem_wr <= 1'b0;
           //mem_addr <= 'b0;
           //mem_wdata <= 'b0;
           //mem_burst_cnt <= 'b0;
@@ -520,7 +525,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                           case (spi_cmd) 
                           `CS_SEL:     begin 
                                           main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
-                                          gpio_dout <= rd_data[GPO_DATA_WIDTH-1:0]; 
+                                          cs_dout <= rd_data[GPO_DATA_WIDTH-1:0]; 
                                        end	
                           `INPUT_SEL:     begin 
                                           main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
@@ -540,7 +545,8 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                                        end	
                           `FIL_SEL:     begin 
                                           main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
-                                          fil_sel <= rd_data[0:0]; 
+                                          fil1_sel <= rd_data[0:0]; 
+                                          fil2_sel <= rd_data[0:0]; 
                                        end										   
                           //`GPI_LD:     begin 
                                           //main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Latch GPI
@@ -556,7 +562,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                                        //end
                           //`GPO_WR:     begin 
                                           //main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
-                                          //gpio_dout <= rd_data[GPO_DATA_WIDTH-1:0]; 
+                                          //cs_dout <= rd_data[GPO_DATA_WIDTH-1:0]; 
                                           //gpio_wr <= 1'b1; 
                                        //end
                           //`MEM_WR:     begin 

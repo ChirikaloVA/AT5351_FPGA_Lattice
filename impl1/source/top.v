@@ -1,78 +1,46 @@
 `timescale 1 ns / 1 ps
 
-//library MACHXO2;
-//use MACHXO2.components.all;
-//library ovi_machxo2;
-//use ovi_machxo2.all;
-//library pmi_work;
-//use pmi_work.all;
-
 module top(
-	input wire clk, 
-	output wire clk_div_6, 
-	output wire clk_5ms, 
-	output wire clk_not_5ms, 
-	input wire comparator, 
-	output wire counter, 
-	output wire reference, 
-	input wire spi_clk, 
-	input wire spi_mosi, 
-	output tri spi_miso, 
-	input wire spi_cs, 
-	//ufm_sn,
-	input wire rst,
-	output wire clk_12mhz,
-	output wire [7:0] 	count,
-    output wire	[3:0]						input_sel,
-	output wire [2:0]						mu_sel,
-	output wire [3:0]						avk_sel,
-	output wire								ref_sel,
-	output wire								fil_sel,
+		input wire clk_12mhz, 
+		output wire clk_4mhz, 
+		output wire clk_5ms, 
+		output wire clk_not_5ms, 
+		input wire adc_comp, 
+		output wire adc_countn, 
+		input wire spi_clk, 
+		input wire spi_mosi, 
+		output tri spi_miso, 
+		input wire spi_cs, 
+		input wire rst,
+		output wire comp1_cs,
+		output wire comp2_cs,
+		output wire relay_cs,
+		output wire relay_reset,
+		output wire vn_cs,
+		input wire 	vn_l,
+		input wire 	vn_h,
+		output wire vn_pol,
+		output wire vn_on,
+		
+		
+		output wire	[3:0]	input_sel,
+		output wire [2:0]	mu_sel,
+		output wire [3:0]	avk_sel,
+		output wire			fil1_sel,
+		output wire			fil2_sel,
 
 
-	// AVK of capacitance
-	input wire pos_comparator,
-	input wire neg_comparator,
-	output wire ref_avk,
-	output wire antibounce,
-	output wire pos_comparator1,
-	output wire neg_comparator1,
-	
-	input wire cnt_choise
-	) /* synthesis GSR = "ENABLED" */	;
+		// AVK of capacitance
+		input wire pos_comparator,
+		input wire neg_comparator,
+		output wire ref_avk,
+		output wire antibounce,
+		
+		input wire cnt_choise
+		) /* synthesis GSR = "ENABLED" */	;
 
-//
-	//input wire clk;
-	//output wire clk_12mhz;
-	
-	//input pos_comparator;
-	//input neg_comparator;
-	//output antibounce;
-	//output pos_comparator1;
-	//output neg_comparator1;
-	//assign pos_comparator1 = pos_comparator;
-	//assign neg_comparator1 = neg_comparator;
 
-	
-	//output wire [7:0] count;
-	
-	assign clk_12mhz = clk;
-	//wire clk;
-	//output wire clk_div_6;
-	//output wire clk_5ms;
-	//output wire clk_not_5ms;
-	//input wire comparator;
-	//output wire counter;
-	//wire counter;
-	
-	//output wire reference;
-	//input wire spi_clk;
-	//input wire spi_mosi; 
-	//output tri spi_miso; 
-	//input wire spi_cs;
-	//input wire ufm_sn;
-	//input wire rst			;
-	
+	wire adc_count; 
 	wire reset;
 	wire rst_sync;
 	assign reset = ~rst;
@@ -84,7 +52,7 @@ module top(
 	reset RESET_SYNC(
 		.async_reset(reset),
 		.sync_reset(rst_sync),
-		.clk(clk)
+		.clk(clk_12mhz)
 		)/* synthesis syn_noprune = 1 */;
 		
 	//wire osc_clk;  
@@ -100,98 +68,90 @@ module top(
 	//assign clk =  osc_clk & osc_clk; /* synthesis syn_keep = 1 */
 	
 		
-	//clock_div_6 CLK_2MHZ(
-		//.clk_in(clk), 
-		////.reset(reset),
-		//.clk_div_6(clk_div_6)							
-		//) /* synthesis syn_noprune = 1 */;
-	//clock_5ms CLK_5MS(
-		//.clk_div_6(clk_div_6),
-		//.reset(reset),		
-		//.clk_5ms(clk_5ms),
-		//.clk_not_5ms(clk_not_5ms)
-		//) /* synthesis syn_noprune = 1 */;		
 			
 	clock_4mhz CLK_4MHZ(
-		.clk_in(clk),
-		.clk_4mhz(clk_div_6),
-		.reset(rst_sync)
+		.clk_12mhz		(clk_12mhz),
+		.clk_4mhz		(clk_4mhz),
+		.reset			(rst_sync)
 		) /* synthesis syn_noprune = 1 */;
 	clock_5ms CLK_5MS(
-		.clk_4mhz(clk_div_6), 
-		.reset(rst_sync), 
-		.clk_5ms(clk_5ms), 
-		.clk_not_5ms(clk_not_5ms)
+		.clk_4mhz		(clk_4mhz), 
+		.reset			(rst_sync), 
+		.clk_5ms		(clk_5ms), 
+		.clk_not_5ms	(clk_not_5ms)
 		) /* synthesis syn_noprune = 1 */;						
 
 
 	wire [23:0] count_p;
 	wire [23:0] count_m;
-	//assign count = ~count_p[7:0];
-	
+
 	ADC_trigger ADC_trigger(
-		.clk(clk_div_6), 
-		.d(comparator), 
-		.q(counter), 
-		.n_q(reference),
-		.reset(rst_sync)
+		.clk	(clk_4mhz), 
+		.d		(adc_comp), 
+		.q		(adc_count), 
+		.n_q	(adc_countn),
+		.reset	(rst_sync)
 		);
-	
-	//Pulse_Counter Pulse_Counter(
-		//.clk(clk), 
-		//.clk_div_6(clk_div_6), 
-		//.trigger(counter), 
-		//.reset(rst_sync),
-		//.count_p(count_p), 
-		//.count_m(count_m)
-		//) ;
-
-
-
-
-
-	//output ref_avk;
-	
 
 	avk_capacitance AVK_CAPACITANCE(
 		.pos_comparator(pos_comparator),
 		.neg_comparator(neg_comparator),
-		.reference(ref_avk),
-		.antibounce(antibounce),
-		.clock_4mhz(clk_div_6), //4MHz	
-		.clock_12mhz(clk), //4MHz	
-		.reset(rst_sync)
+		.reference	(ref_avk),
+		.antibounce	(antibounce),
+		.clock_4mhz	(clk_4mhz), //4MHz	
+		.clock_12mhz(clk_12mhz), //12MHz	
+		.reset		(rst_sync)
 		
 		);
 
 
-
-	//input cnt_choise;
-
-	
 	wire cnt_in;
 	wire cnt_en;
 	count_choise COUNT_CHOISE(
-		.cnt_choise(cnt_choise),
-		.count1(counter),
-		.enable1(1'b1),
-		.count2(ref_avk),
-		.enable2(antibounce),
-		.count(cnt_in),
-		.enable(cnt_en)
+		.cnt_choise	(cnt_choise),
+		.count1		(adc_count),
+		.enable1	(1'b1),
+		.count2		(ref_avk),
+		.enable2	(antibounce),
+		.count		(cnt_in),
+		.enable		(cnt_en)
 		);
 	
 	counter COUNTER(
-		.clk_12mhz(clk),
-		.clk_4mhz(clk_div_6),
-		.cnt(cnt_in),
-		.en(cnt_en),
-		.count_p(count_p),
-		.count_m(count_m),
-		
-		.reset(rst_sync)
+		.clk_12mhz	(clk_12mhz),
+		.clk_4mhz	(clk_4mhz),
+		.cnt		(cnt_in),
+		.en			(cnt_en),
+		.count_p	(count_p),
+		.count_m	(count_m),
+		.reset		(rst_sync)
 		);
 
+
+	FIFO FIFO(
+		.Data(count_p), 
+		.WrClock(clk_12mhz), 
+		.RdClock(clk_12mhz), 
+		.WrEn(), 
+		.RdEn(), 
+		.Reset(rst_sync), 
+		.RPReset(rst_sync), 
+		.Q(), 
+		.Empty(), 
+		.Full(), 
+		.AlmostEmpty(), 
+		.AlmostFull()
+		);
+
+	highvoltage HV_not_ready(
+		.clk(clk_12mhz),
+		.vn_l(vn_l),
+		.vn_h(vn_h),
+		.vn_pol(vn_pol),
+		.vn_on(vn_on),
+		.reset(rst_sync)
+		
+		);
 
 /*	SPI_slave SPI(
 		.clk(clk), 
@@ -205,11 +165,6 @@ module top(
 		);	*/
 		
 		
-	//pwm PWM(
-		//.clk(clk_div_6),
-		//.reset(reset),
-		//.pwm(pwm)
-		//) /* synthesis syn_noprune = 1 */;
 	wire       wb_clk_i;
 	wire       wb_rst_i;
 	wire       wb_cyc_i;
@@ -231,95 +186,79 @@ module top(
 	wire 	   spi_irq;
 
 	
-	assign wb_clk_i = clk;
+	assign wb_clk_i = clk_12mhz;
 	assign wb_rst_i = rst_sync;
 	
 	SPI  SPI (
-		.wb_clk_i(wb_clk_i), 
-		.wb_rst_i(wb_rst_i), 
-		.wb_cyc_i(wb_cyc_i), 
-		.wb_stb_i(wb_stb_i), 
-		.wb_we_i(wb_we_i), 
-		.wb_adr_i(wb_adr_i), 
-		.wb_dat_i(wb_dat_i), 
-		.wb_dat_o(wb_dat_o), 
-		.wb_ack_o(wb_ack_o), 
-		.spi_clk(spi_clk), 
-		.spi_miso(spi_miso), 
-		.spi_mosi(spi_mosi), 
-		.spi_scsn(spi_cs), 
-		.spi_irq(spi_irq)
+		.wb_clk_i	(wb_clk_i), 
+		.wb_rst_i	(wb_rst_i), 
+		.wb_cyc_i	(wb_cyc_i), 
+		.wb_stb_i	(wb_stb_i), 
+		.wb_we_i	(wb_we_i), 
+		.wb_adr_i	(wb_adr_i), 
+		.wb_dat_i	(wb_dat_i), 
+		.wb_dat_o	(wb_dat_o), 
+		.wb_ack_o	(wb_ack_o), 
+		.spi_clk	(spi_clk), 
+		.spi_miso	(spi_miso), 
+		.spi_mosi	(spi_mosi), 
+		.spi_scsn	(spi_cs), 
+		.spi_irq	(spi_irq)
 
 		)/* synthesis syn_noprune = 1 */;
 		
-				
-		
-
+	
 	wb_ctrl Wisbone_Control(
-		.wb_clk_i(wb_clk_i), // WISHBONE clock 
-		.wb_rst_i(wb_rst_i), // WISHBONE reset
-		.wb_cyc_i(wb_cyc_i), // WISHBONE bus cycle
-		.wb_stb_i(wb_stb_i), // WISHBONE strobe
-		.wb_we_i(wb_we_i),  // WISHBONE write/read control
-		.wb_adr_i(wb_adr_i), // WISHBONE address
-		.wb_dat_i(wb_dat_i), // WISHBONE input data
-		.wb_dat_o(wb_dat_o), // WISHBONE output data
-		.wb_ack_o(wb_ack_o), // WISHBONE transfer acknowledge
-		.address(address),  // Local address
-		.wr_en(wr_en),    // Local write enable
-		.wr_data(wr_data),  // Local write data
-		.rd_en(rd_en),    // Local read enable
-		.rd_data(rd_data),  // Local read data
-		.xfer_done(wb_xfer_done),// WISHBONE transfer done
-		.xfer_req(wb_xfer_req)  // WISHBONE transfer request
+		.wb_clk_i	(wb_clk_i), // WISHBONE clock 
+		.wb_rst_i	(wb_rst_i), // WISHBONE reset
+		.wb_cyc_i	(wb_cyc_i), // WISHBONE bus cycle
+		.wb_stb_i	(wb_stb_i), // WISHBONE strobe
+		.wb_we_i	(wb_we_i),  // WISHBONE write/read control
+		.wb_adr_i	(wb_adr_i), // WISHBONE address
+		.wb_dat_i	(wb_dat_i), // WISHBONE input data
+		.wb_dat_o	(wb_dat_o), // WISHBONE output data
+		.wb_ack_o	(wb_ack_o), // WISHBONE transfer acknowledge
+		.address	(address),  // Local address
+		.wr_en		(wr_en),    // Local write enable
+		.wr_data	(wr_data),  // Local write data
+		.rd_en		(rd_en),    // Local read enable
+		.rd_data	(rd_data),  // Local read data
+		.xfer_done	(wb_xfer_done),// WISHBONE transfer done
+		.xfer_req	(wb_xfer_req)  // WISHBONE transfer request
 		);	
                                   
    main_ctrl main_ctrl_inst (
-                   .clk            (clk          ),
-                   .rst_n          (rst_sync     ),
-                   .spi_csn        (spi_cs       ),
-                   .address        (address      ), 
-                   .wr_en          (wr_en        ),
-                   .wr_data        (wr_data      ),
-                   .rd_en          (rd_en        ),    
-                   .rd_data        (rd_data      ),
-                   .wb_xfer_done   (wb_xfer_done ),
-                   .wb_xfer_req    (wb_xfer_req  ),
+		.clk            (clk_12mhz    ),
+		.rst_n          (rst_sync     ),
+		.spi_csn        (spi_cs       ),
+		.address        (address      ), 
+		.wr_en          (wr_en        ),
+		.wr_data        (wr_data      ),
+		.rd_en          (rd_en        ),    
+		.rd_data        (rd_data      ),
+		.wb_xfer_done   (wb_xfer_done ),
+		.wb_xfer_req    (wb_xfer_req  ),
 
-
-					.input_sel	(input_sel),
-					.mu_sel		(mu_sel),
-					.avk_sel	(avk_sel),
-					.ref_sel	(ref_sel),
-					.fil_sel	(fil_sel),
-					//.en_port(),      // Genaral purpose enable port
-					//.gpi_ld(),       // GPI latch
-					//.gpio_wr(),      // GPIO write (high) and read (low)
-					//.gpio_addr(),    // GPIO port address                     
-					.gpo_out(count[3:0])    // GPIO port output data bus
-					//.gpio_din(),     // GPIO port input data bus
-					//.mem_wr(),       // Memory write (high) and read (low)
-					//.mem_addr(),     // Memory address
-					//.mem_wdata(),    // Memory write data bus
-					//.mem_rdata(),    // Memory read data bus
-					//.irq_status(),   // IRQ status     
-					//.irq_en(),       // IRQ enable
-					//.irq_clr()       // IRQ clear				   
-                   )/* synthesis syn_noprune = 1 */;
-	
-	
-	
-
+		.input_sel	(input_sel),
+		.mu_sel		(mu_sel),
+		.avk_sel	(avk_sel),
+		//.ref_sel	(ref_sel),
+		.ref_sel	(),
+		.fil1_sel	(fil1_sel),
+		.fil2_sel	(fil2_sel),
+		.relay_reset(relay_reset),
+		.cs_out	({vn_cs, relay_cs, comp2_cs, comp1_cs})    
+		)/* synthesis syn_noprune = 1 */;
 	
 endmodule
 
 
 
 module reset(
-	input wire async_reset,
-	output wire sync_reset,
-	input wire clk
-	);
+		input wire async_reset,
+		output wire sync_reset,
+		input wire clk
+		);
 	
 	reg reset_out, rff1;
 	assign 	sync_reset = ~reset_out;
