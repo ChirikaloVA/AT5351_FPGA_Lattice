@@ -16,11 +16,11 @@ module top(
 		output wire comp2_cs,
 		output wire relay_cs,
 		output wire relay_reset,
-		output wire vn_cs,
-		input wire 	vn_l,
-		input wire 	vn_h,
-		output wire vn_pol,
-		output wire vn_on,
+		//output wire vn_cs,
+		//input wire 	vn_l,
+		//input wire 	vn_h,
+		//output wire vn_pol,
+		//output wire vn_on,
 		
 		
 		output wire	[3:0]	input_sel,
@@ -128,22 +128,36 @@ module top(
 		);
 
 
+	wire [23:0] count;
+	wire fifo_wr_en;
+	wire fifo_rd_en;
+	wire [23:0] fifo_out;
+	count_prebufer COUNT_PREBUFFER (
+		.clk_12mhz(clk_12mhz),
+		.mode(cnt_choise),
+		.count_m(count_m),
+		.count_p(count_p),
+		.count(count),
+		.wr_en(fifo_wr_en),
+		.reset(rst_sync)
+		);
+	
 	FIFO FIFO(
-		.Data(count_p), 
+		.Data(count), 
 		.WrClock(clk_12mhz), 
 		.RdClock(clk_12mhz), 
-		.WrEn(), 
-		.RdEn(), 
+		.WrEn(fifo_wr_en), 
+		.RdEn(fifo_rd_en), 
 		.Reset(rst_sync), 
 		.RPReset(rst_sync), 
-		.Q(), 
+		.Q(fifo_out), 
 		.Empty(), 
 		.Full(), 
 		.AlmostEmpty(), 
 		.AlmostFull()
 		);
 
-	highvoltage HV_not_ready(
+/*	highvoltage HV_not_ready(
 		.clk(clk_12mhz),
 		.vn_l(vn_l),
 		.vn_h(vn_h),
@@ -152,6 +166,7 @@ module top(
 		.reset(rst_sync)
 		
 		);
+*/
 
 /*	SPI_slave SPI(
 		.clk(clk), 
@@ -247,7 +262,9 @@ module top(
 		.fil1_sel	(fil1_sel),
 		.fil2_sel	(fil2_sel),
 		.relay_reset(relay_reset),
-		.cs_out	({vn_cs, relay_cs, comp2_cs, comp1_cs})    
+		.cs_out	({vn_cs, relay_cs, comp2_cs, comp1_cs}),
+		.fifo_data(fifo_out),
+		.fifo_rd_en(fifo_rd_en)
 		)/* synthesis syn_noprune = 1 */;
 	
 endmodule

@@ -170,3 +170,37 @@ module count_choise(
 		end	
 
 endmodule
+
+
+module count_prebufer(
+		input wire clk_12mhz,
+		input wire mode,
+		input wire [23:0] count_m,
+		input wire [23:0] count_p,
+		output reg [23:0] count,
+		output reg wr_en,
+		input wire reset
+		);
+	
+	initial begin
+		wr_en <= 1'b0;
+		count <= 24'b0;
+		end
+		
+	always @(posedge clk_12mhz or posedge reset) begin
+		if (reset) begin
+			wr_en <= 1'b0;
+			count <= 24'b0;
+			end
+		else begin
+			wr_en <= 1'b1;
+			if (!mode) begin
+				count <= count_p - count_m;
+				//wr_en <= 1'b1;
+				end
+			else begin
+				
+				end
+			end
+		end
+endmodule

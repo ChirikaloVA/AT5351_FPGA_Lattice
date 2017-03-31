@@ -82,7 +82,9 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
 	output reg								fil2_sel,
 	output wire 							relay_reset,
 	
-	output wire  [GPO_DATA_WIDTH-1:0]       cs_out    // GPIO port output data bus
+	output wire  [GPO_DATA_WIDTH-1:0]       cs_out,    // GPIO port output data bus
+	input wire [23:0] 						fifo_data,
+	output reg								fifo_rd_en
     //input  wire [GPI_DATA_WIDTH-1:0]       gpio_din,     // GPIO port input data bus
     //output reg                             mem_wr,       // Memory write (high) and read (low)
     //output reg  [MEM_ADDR_WIDTH-1:0]       mem_addr,     // Memory address
@@ -123,16 +125,8 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     `define C_AVK_SEL  	 	8'h04  
     `define C_REF_SEL  	 	8'h05
     `define C_FIL_SEL  	 	8'h06
-    //`define C_EN_CLR     8'h04 
-    //`define C_GPO_WR     8'h01 
-    //`define C_GPI_LD     8'h03 
-    //`define C_GPI_RD     8'h05 
-    //`define C_MEM_WR     8'h02 
-    //`define C_MEM_RD     8'h0B    
-    //`define C_IRQ_EN_WR  8'h66 
-    //`define C_IRQ_EN_RD  8'h6A 
-    //`define C_IRQ_ST     8'h65 
-    //`define C_IRQ_CLR    8'h61 
+	`define C_FIFO_RD  	 	8'h07
+	
     `define C_REV_ID     8'h9F 
     
     // The definitions for the slim version of the SPI command values
@@ -142,16 +136,8 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     `define AVK_SEL  	 4'h3  
     `define REF_SEL  	 4'h4 
 	`define FIL_SEL  	 4'h5
-    //`define EN_CLR     4'h1    
-    //`define GPO_WR     4'h2  
-    //`define GPI_LD     4'h3  
-    //`define GPI_RD     4'h4  
-    //`define MEM_WR     4'h5  
-    //`define MEM_RD     4'h6    
-    //`define IRQ_EN_WR  4'h7   
-    //`define IRQ_EN_RD  4'h8
-    //`define IRQ_ST     4'h9  
-    //`define IRQ_CLR    4'hA  
+	`define FIFO_RD  	 4'h6
+	
     `define REV_ID     4'hB  
     `define INVALID    4'hF  
         
@@ -170,7 +156,8 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     wire       spi_xfer_done;     // SPI transmitting complete (1: complete, 0: in progress) 
     //reg  [7:0] mem_burst_cnt;
 
-	reg [3:0] 	spi_byte_counter;	
+	reg [3:0] 	spi_byte_counter;	
+
 	assign cs_out[3:0] = spi_csn_buf0_p ? cs_dout[3:0] : 4'hF;
 
     // Bufferring spi_csn with postive edge                    
@@ -229,7 +216,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           spi_cmd <= `REV_ID;
           rd_en <= 1'b0;
           wr_en <= 1'b0;
-          address <= 8'h59;
+          address <= `SPITXDR;
           wr_data <= 8'd0;
           //en_port <= 1'b0;
           //gpi_ld <= 1'b0;
@@ -257,10 +244,10 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           //gpio_wr <= 1'b0;
           //mem_wr <= 1'b0;
           
-          address <= 8'h59;
+          address <= `SPITXDR;
           
           case (main_sm)
-          // IDEL state
+          // IDLE state
           `S_IDLE:     if (spi_cmd_start && wb_xfer_req) begin
                           main_sm <= `S_RXDR_RD;            // Go to `S_RSDR_RD state when a new SPI command starts and
                                                             // WISHBONE is ready to transfer
@@ -301,25 +288,26 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           `S_CMD_LD:   if (wb_xfer_done) begin
                           main_sm <= `S_CMD_DEC;            // Go to `S_CMD_DEC state when the RXDR register read is done
                           case (rd_data)
-						  `C_CS_SEL:	 spi_cmd <= `CS_SEL;
-                          `C_INPUT_SEL:	 spi_cmd <= `INPUT_SEL;
-                          `C_MU_SEL:	 spi_cmd <= `MU_SEL;
-                          `C_AVK_SEL:	 spi_cmd <= `AVK_SEL;
-                          `C_REF_SEL:	 spi_cmd <= `REF_SEL;
-                          `C_FIL_SEL:	 spi_cmd <= `FIL_SEL;
-                          //`C_EN_SET:     spi_cmd <= `EN_SET;   
-                          //`C_EN_CLR:     spi_cmd <= `EN_CLR;  
-                          //`C_GPO_WR:     spi_cmd <= `GPO_WR;  
-                          //`C_GPI_LD:     spi_cmd <= `GPI_LD;  
-                          //`C_GPI_RD:     spi_cmd <= `GPI_RD;  
-                          //`C_MEM_WR:     spi_cmd <= `MEM_WR;  
-                          //`C_MEM_RD:     spi_cmd <= `MEM_RD;  
-                          //`C_IRQ_EN_WR:  spi_cmd <= `IRQ_EN_WR;  
-                          //`C_IRQ_EN_RD:  spi_cmd <= `IRQ_EN_RD;
-                          //`C_IRQ_ST:     spi_cmd <= `IRQ_ST;  
-                          //`C_IRQ_CLR:    spi_cmd <= `IRQ_CLR; 
-                          `C_REV_ID:     spi_cmd <= `REV_ID;    
-                          default:       spi_cmd <= `INVALID;
+    						  `C_CS_SEL:	 spi_cmd <= `CS_SEL;
+                              `C_INPUT_SEL:	 spi_cmd <= `INPUT_SEL;
+                              `C_MU_SEL:	 spi_cmd <= `MU_SEL;
+                              `C_AVK_SEL:	 spi_cmd <= `AVK_SEL;
+                              `C_REF_SEL:	 spi_cmd <= `REF_SEL;
+                              `C_FIL_SEL:	 spi_cmd <= `FIL_SEL;
+                              `C_FIFO_RD:	 spi_cmd <= `FIFO_RD;
+                              //`C_EN_SET:     spi_cmd <= `EN_SET;   
+                              //`C_EN_CLR:     spi_cmd <= `EN_CLR;  
+                              //`C_GPO_WR:     spi_cmd <= `GPO_WR;  
+                              //`C_GPI_LD:     spi_cmd <= `GPI_LD;  
+                              //`C_GPI_RD:     spi_cmd <= `GPI_RD;  
+                              //`C_MEM_WR:     spi_cmd <= `MEM_WR;  
+                              //`C_MEM_RD:     spi_cmd <= `MEM_RD;  
+                              //`C_IRQ_EN_WR:  spi_cmd <= `IRQ_EN_WR;  
+                              //`C_IRQ_EN_RD:  spi_cmd <= `IRQ_EN_RD;
+                              //`C_IRQ_ST:     spi_cmd <= `IRQ_ST;  
+                              //`C_IRQ_CLR:    spi_cmd <= `IRQ_CLR; 
+                              `C_REV_ID:     spi_cmd <= `REV_ID;    
+                              default:       spi_cmd <= `INVALID;
                           endcase
                        end
           // Decode the SPI command              
@@ -352,6 +340,11 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                                           address <= `SPITXDR; 
                                        end 									   
                           `FIL_SEL:     begin 
+                                          main_sm <= `S_TXDR_WR1;     // Go to `S_IDLE state when the SPI command is Enable
+										  wr_en <= 1'b1; 
+                                          address <= `SPITXDR; 
+                                       end 		
+						  `FIFO_RD:     begin 
                                           main_sm <= `S_TXDR_WR1;     // Go to `S_IDLE state when the SPI command is Enable
 										  wr_en <= 1'b1; 
                                           address <= `SPITXDR; 
@@ -417,6 +410,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                                           address <= `SPITXDR; 
                                           wr_data <= REVISION_ID; 
                                        end
+                          `INVALID:   main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is illegal
                           default:     main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is illegal
                           endcase
                   
@@ -547,7 +541,11 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                                           main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
                                           fil1_sel <= rd_data[0:0]; 
                                           fil2_sel <= rd_data[0:0]; 
-                                       end										   
+                                       end			
+					      `FIFO_RD:     begin 
+                                          main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
+                                          fifo_rd_en <= 1'b1; 
+                                       end		
                           //`GPI_LD:     begin 
                                           //main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Latch GPI
                                           //gpi_ld <= rd_data[0]; 
