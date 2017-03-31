@@ -1,0 +1,44 @@
+#-- Lattice Semiconductor Corporation Ltd.
+#-- Bali Reveal project file
+
+#device options
+[Device]
+part = LCMXO2-2000ZE-1TG100I
+family = MachXO2
+device = LCMXO2-2000ZE
+speed = 1
+package = TQFP100
+operation = Industrial
+
+#design options
+[Design]
+title = DKS_5351_MACHXO2_2000
+path = D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1
+core_generate = D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1
+search_path = D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000
+top = top
+lpf = D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/DKS_5351_MACHXO2_2000.lpf
+synthesis = lse
+
+#strategy options
+VHDL2008 = false
+
+#HDLs options
+[HDLs]
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/top.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/dividers1.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/counter.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/capacitance_avk.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/highvoltage.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/main_ctrl.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/wb_ctrl.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/SPI.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/FIFO.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/RAM.v = Verilog
+[HDL_Defines]
+SBP_SYNTHESIS=
+[HDL_Param]
+[Generated]
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/reveal_workspace/tmpreveal/top_la0_trig_gen.v=Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/reveal_workspace/tmpreveal/top_la0_gen.v=Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/reveal_workspace/tmpreveal/top_rvl.v=Verilog,work

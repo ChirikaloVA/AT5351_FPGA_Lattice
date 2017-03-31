@@ -1,0 +1,25 @@
+<Project ModBy="Inserter" SigType="0" Name="D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/reveal/first.rvl" Date="2017-03-15">
+    <IP Version="1_5_062609"/>
+    <Design DesignEntry="Schematic/Verilog HDL" Synthesis="lse" DeviceFamily="MachXO2" DesignName="DKS_5351_MACHXO2_2000"/>
+    <Core InsertDataset="0" Insert="1" Reveal_sig="81696532" Name="top_LA0" ID="0">
+        <Setting>
+            <Clock SampleClk="clk_12mhz" SampleEnable="0" EnableClk="" EnableClk_Pri="0"/>
+            <TraceBuffer Implementation="0" BitTimeStamp="0" hasTimeStamp="0" IncTrigSig="1" BufferDepth="4096"/>
+            <Capture Mode="1" MinSamplesPerTrig="32"/>
+            <Event CntEnable="0" MaxEventCnt="8"/>
+            <TrigOut Polarity="0" MinPulseWidth="0" TrigOutNetType="1" EnableTrigOut="0" TrigOutNet="reveal_debug_top_LA0_net"/>
+            <DistRAM Disable="0"/>
+        </Setting>
+        <Dataset Name="Base">
+            <Trace>
+                <Sig Type="SIG" Name="clk_4mhz"/>
+                <Sig Type="SIG" Name="clk_5ms"/>
+            </Trace>
+            <Trigger>
+                <TU Serialbits="0" Type="0" ID="1" Sig="clk_4mhz,"/>
+                <TU Serialbits="0" Type="0" ID="2" Sig="clk_5ms,"/>
+                <TE MaxSequence="4" MaxEvnCnt="32" ID="1" Resource="1"/>
+            </Trigger>
+        </Dataset>
+    </Core>
+</Project>
