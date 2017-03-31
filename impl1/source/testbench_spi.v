@@ -149,35 +149,41 @@ module testbench_spi();
 
 
 	top top(
-		.clk(clk_12mhz), 
-		.clk_div_6(), 
+		.clk_12mhz(clk_12mhz), 
+		.clk_4mhz(), 
 		.clk_5ms(), 
 		.clk_not_5ms(), 
-		.comparator(), 
-		.counter(), 
-		.reference(), 
+		.adc_comp(), 
+		.adc_countn(), 
 		.spi_clk(spi_clk_wire), 
 		.spi_mosi(spi_mosi_wire), 
 		.spi_miso(spi_miso), 
 		.spi_cs(spi_cs_wire),
 		//.ufm_sn(ufm_sn),
 		.rst(~reset),
-		.clk_12mhz(),
-		.count(),
+		.comp1_cs(),
+		.comp2_cs(),
+		.relay_cs(),
+		.relay_reset(),
+		.vn_cs(),
+		.vn_l(),
+		.vn_h(),
+		.vn_pol(),
+		.vn_on(),
 		
 		
-		.input_sel	(),
-		.mu_sel		(),
-		.avk_sel	(),
-		.ref_sel	(),
-		.fil_sel	(),
+		.input_sel(),
+		.mu_sel(),
+		.avk_sel(),
+		.fil1_sel(),
+		.fil2_sel(),
+
+
 		// AVK of capacitance
 		.pos_comparator(),
 		.neg_comparator(),
 		.ref_avk(),
 		.antibounce(),
-		.pos_comparator1(),
-		.neg_comparator1(),
 		
 		.cnt_choise()
 		);
