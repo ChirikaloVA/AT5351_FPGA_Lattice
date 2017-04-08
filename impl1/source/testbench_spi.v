@@ -165,11 +165,11 @@ module testbench_spi();
 		.comp2_cs(),
 		.relay_cs(),
 		.relay_reset(),
-		.vn_cs(),
-		.vn_l(),
-		.vn_h(),
-		.vn_pol(),
-		.vn_on(),
+//		.vn_cs(),
+//		.vn_l(),
+//		.vn_h(),
+//		.vn_pol(),
+//		.vn_on(),
 		
 		
 		.input_sel(),
