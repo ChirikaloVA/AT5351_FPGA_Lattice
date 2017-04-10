@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DiamondModule name="SPI" module="EFB" VendorName="Lattice Semiconductor Corporation" generator="IPexpress" date="2017 01 19 14:48:39.388" version="1.2" type="Module" synthesis="lse" source_format="Verilog">
+<DiamondModule name="SPI" module="SPI" VendorName="Lattice Semiconductor Corporation" generator="IPexpress" date="2017 04 08 14:16:47.957" version="1.2" type="Module" synthesis="lse" source_format="Verilog HDL">
   <Package>
-		<File name="SPI.lpc" type="lpc" modified="2017 01 19 14:48:37.419"/>
-		<File name="SPI.v" type="top_level_verilog" modified="2017 01 19 14:48:37.623"/>
-		<File name="SPI_tmpl.v" type="template_verilog" modified="2017 01 19 14:48:37.654"/>
+		<File name="SPI.lpc" type="lpc" modified="2017 04 08 14:16:45.832"/>
+		<File name="SPI.v" type="top_level_verilog" modified="2017 04 08 14:16:46.114"/>
+		<File name="SPI_tmpl.v" type="template_verilog" modified="2017 04 08 14:16:46.114"/>
   </Package>
 </DiamondModule>

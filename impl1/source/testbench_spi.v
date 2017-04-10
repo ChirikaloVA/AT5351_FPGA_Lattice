@@ -46,7 +46,7 @@ module testbench_spi();
 		spi_divider <= 8'd0;
 		spi_clk_counter <= 8'd0;
 		buffer0 <= 8'h01;	//0x01
-		buffer1 <= 8'h01;	//0x05	  	
+		buffer1 <= 8'h11;	//0x05	  	
 		
 		$display("Running 'spi' testbench");
 		//#350 reset <= 1'b1;  
@@ -57,7 +57,7 @@ module testbench_spi();
 		//#1240000 trigger = 1'b0;
 
 
-		#200000 $stop;
+		#1000000 $stop;
 		$display("'spi' testbench stopped");
 		end
 
@@ -78,10 +78,50 @@ module testbench_spi();
 		#(4000) spi_cs <= 1'b0;
 		#(20000) spi_cs <= 1'b1;  
 		buffer1 <= buffer1 + 8'b1;	   
-		if (buffer1 == 8'hF) begin 
-			buffer0 <= buffer0 + 8'b1;
-			buffer1 <= 8'b0; 
-		end
+		//if (buffer1 == 8'hF) begin 
+//			buffer0 <= buffer0 + 8'b1;
+//			buffer1 <= 8'b0; 
+//			end		   
+		case(buffer0)
+			8'h01: 
+				case(buffer1[7:4])
+					4'h1:
+						case(buffer1[3:0])
+							4'h1:  buffer1[3:0] <= 4'h2;
+							4'h2:  buffer1[3:0] <= 4'h3;
+							4'h3:  buffer1[3:0] <= 4'h4;
+							4'h4:  buffer1[3:0] <= 4'hF;
+							4'hF:  buffer1 <= 8'h21;
+							endcase
+					4'h2:
+						case(buffer1[3:0])
+							4'h1:  buffer1[3:0] <= 4'h2;
+							4'h2:  buffer1[3:0] <= 4'h3;
+							4'h3:  buffer1 <= 8'h31;
+							endcase
+					4'h3:
+						case(buffer1[3:0])
+							4'h1:  buffer1[3:0] <= 4'h2;
+							4'h2:  buffer1[3:0] <= 4'h3;
+							4'h3:  buffer1[3:0] <= 4'h4;
+							4'h4:  buffer1[3:0] <= 4'hF;
+							4'hF:  buffer1 <= 8'h40;
+							endcase
+					4'h4:
+						case(buffer1[3:0])
+							4'h0:  buffer1[3:0] <= 4'hF;
+							4'hF:  buffer1 <= 8'h50;
+						endcase		
+					4'h5:
+						case(buffer1[3:0])
+							4'h0:  buffer1[3:0] <= 4'hF;
+							4'hF:  begin
+									buffer1 <= 8'h01;
+									buffer0 <= 8'h02;	 
+									end
+							endcase								
+					endcase	
+			endcase
 	end	
 		
 	reg [4:0] i = 0;
@@ -143,7 +183,9 @@ module testbench_spi();
 		
 	always @(posedge spi_clk) begin	 
 		if (i==0) spi_mosi <= buffer0>>(8'd7 - spi_clk_counter);
-		else if (i==1)	spi_mosi <= buffer1>>(8'd7 - spi_clk_counter);
+		else if (i==1)	begin
+			spi_mosi <= buffer1>>(8'd7 - spi_clk_counter);
+			end
 		end
 
 
