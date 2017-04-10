@@ -52,7 +52,9 @@ module testbench_spi();
 		//#350 reset <= 1'b1;  
 		
 		#400 reset <= 1'b0;	   
-
+		
+		$display("Set FPGA outs");
+		
 		//#400000 trigger = 1'b1;
 		//#1240000 trigger = 1'b0;
 
@@ -77,7 +79,7 @@ module testbench_spi();
 	always  begin
 		#(4000) spi_cs <= 1'b0;
 		#(20000) spi_cs <= 1'b1;  
-		buffer1 <= buffer1 + 8'b1;	   
+		//buffer1 <= buffer1 + 8'b1;	   
 		//if (buffer1 == 8'hF) begin 
 //			buffer0 <= buffer0 + 8'b1;
 //			buffer1 <= 8'b0; 
@@ -111,16 +113,45 @@ module testbench_spi();
 						case(buffer1[3:0])
 							4'h0:  buffer1[3:0] <= 4'hF;
 							4'hF:  buffer1 <= 8'h50;
-						endcase		
+							endcase		
 					4'h5:
 						case(buffer1[3:0])
 							4'h0:  buffer1[3:0] <= 4'hF;
 							4'hF:  begin
 									buffer1 <= 8'h01;
-									buffer0 <= 8'h02;	 
+									buffer0 <= 8'h02;
+									#(20000) $display("View FPGA outs");
 									end
 							endcase								
-					endcase	
+					endcase		 
+			8'h02: 
+				case(buffer1)
+					8'h01: buffer1 <= 8'h02;
+					8'h02: buffer1 <= 8'h03;
+					8'h03: buffer1 <= 8'h04;
+					8'h04: buffer1 <= 8'h05;
+					8'h05: begin	
+							buffer1 <= 8'h01;
+							buffer0 <= 8'h03; 
+							#(20000) $display("Select SPI device");
+							end
+					endcase
+			8'h03: 
+				case(buffer1)
+					8'h01: begin
+							buffer1 <= 8'h02;
+							#(20000) $display("comp1 on");
+							end
+					8'h02: begin
+							buffer1 <= 8'h03;
+							#(40000) $display("comp2 on");
+							end
+					8'h03: begin	
+							buffer1 <= 8'h01;
+							buffer0 <= 8'h03;
+							#(1500) $display("relay on");
+							end
+					endcase
 			endcase
 	end	
 		

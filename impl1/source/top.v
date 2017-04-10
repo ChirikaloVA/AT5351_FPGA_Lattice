@@ -262,7 +262,7 @@ module top(
 		.fil1_sel	(fil1_sel),
 		.fil2_sel	(fil2_sel),
 		.relay_reset(relay_reset),
-		.cs_out	({vn_cs, relay_cs, comp2_cs, comp1_cs}),
+		.cs_out	({relay_cs, comp2_cs, comp1_cs}),
 		.fifo_data(fifo_out),
 		.fifo_rd_en(fifo_rd_en)
 		)/* synthesis syn_noprune = 1 */;

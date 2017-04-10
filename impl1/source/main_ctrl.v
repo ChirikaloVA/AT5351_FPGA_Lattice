@@ -82,7 +82,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
 	output reg								fil2_sel,
 	output wire 							relay_reset,
 	
-	output wire  [GPO_DATA_WIDTH-1:0]       cs_out,    // GPIO port output data bus
+	output wire  [2:0]       				cs_out,    // GPIO port output data bus
 	input wire [23:0] 						fifo_data,
 	output reg								fifo_rd_en
     //input  wire [GPI_DATA_WIDTH-1:0]       gpio_din,     // GPIO port input data bus
@@ -96,7 +96,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     );
     
 	
-	reg  [GPO_DATA_WIDTH-1:0]       cs_dout;    // GPIO port output data bus
+	reg  [2:0] cs_dout;    // GPIO port output data bus
     
     // The definitions for SPI EFB register address
     `define SPITXDR 8'h59
@@ -161,7 +161,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     reg [7:0] meas_data;
 
 
-	assign cs_out[3:0] = spi_csn_buf0_p ? cs_dout[3:0] : 4'hF;
+	assign cs_out[2:0] = spi_csn_buf0_p ? cs_dout[2:0] : 3'b111;
 
     // Bufferring spi_csn with postive edge                    
     always @(posedge clk or posedge rst_n)
@@ -227,7 +227,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           ref_sel <= 1'b0;
           fil1_sel <= 1'b0;       
           fil2_sel <= 1'b1;       
-          cs_dout <= 4'b0;
+          cs_dout <= 3'b111;
 
        end else begin
           rd_en <= 1'b0;
@@ -508,6 +508,17 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
 										  default: wr_data <= 8'hFF;
 										  endcase
                                        end 
+                          `SEL_SPI:   begin 
+										main_sm <= `S_WDATA_ST;     // Go to `S_IDLE state when the SPI command is Write GPO
+										wr_en <= 1'b1;
+										address <= `SPITXDR;
+										case(rd_data[3:0])
+										  4'd1: cs_dout <= 3'b110;
+										  4'd2:	cs_dout <= 3'b101;
+										  4'd3: cs_dout <= 3'b011;
+										  default: cs_dout <= 3'b111;
+										  endcase
+                                       end 								   
                           default:     main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is Revision ID                              
                           endcase
                        end
