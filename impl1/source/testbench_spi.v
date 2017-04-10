@@ -145,11 +145,18 @@ module testbench_spi();
 					8'h02: begin
 							buffer1 <= 8'h03;
 							#(40000) $display("comp2 on");
+							end	   
+					8'h03: begin
+							buffer1 <= 8'h04;
+							#(40000) $display("relay on");
 							end
-					8'h03: begin	
+					8'h04: begin
+							buffer1 <= 8'h0F;
+							end
+					8'h0F: begin	
 							buffer1 <= 8'h01;
-							buffer0 <= 8'h03;
-							#(1500) $display("relay on");
+							buffer0 <= 8'h04;
+							#(1500) $display("all off");
 							end
 					endcase
 			endcase

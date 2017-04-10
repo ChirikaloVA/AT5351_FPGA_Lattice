@@ -513,10 +513,23 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
 										wr_en <= 1'b1;
 										address <= `SPITXDR;
 										case(rd_data[3:0])
-										  4'd1: cs_dout <= 3'b110;
-										  4'd2:	cs_dout <= 3'b101;
-										  4'd3: cs_dout <= 3'b011;
-										  default: cs_dout <= 3'b111;
+										  4'h1: begin 
+												cs_dout <= 3'b110; 
+												wr_data <= 8'hFF;
+												end 
+										  4'h2:	begin
+												cs_dout <= 3'b101;
+												wr_data <= 8'hFF;
+												end
+										  4'h3: begin
+												cs_dout <= 3'b011;
+												wr_data <= 8'hFF;
+												end
+										  4'hF: begin
+												cs_dout <= 3'b111;
+												wr_data <= 8'hFF;
+												end
+										  default: wr_data <= 8'h00;
 										  endcase
                                        end 								   
                           default:     main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is Revision ID                              
