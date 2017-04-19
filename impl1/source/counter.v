@@ -139,7 +139,7 @@ endmodule
  * @param  enable        Сигнал разрешения измерения выход
  */
 module count_choise(
-		input wire cnt_choise,
+		input wire count_mode,
 		input wire count1,
 		input wire enable1,
 		input wire count2,
@@ -159,7 +159,7 @@ module count_choise(
 		end
 		
 	always @(*) begin
-		if (cnt_choise) begin
+		if (count_mode) begin
 			cnt_in = count2;
 			cnt_en = enable2;
 			end
@@ -179,6 +179,8 @@ module count_prebufer(
 		input wire [23:0] count_p,
 		output reg [23:0] count,
 		output reg wr_en,
+		input wire [3:0] spi_cmd,
+		input wire [3:0] fifo_level,
 		input wire reset
 		);
 	
@@ -193,14 +195,15 @@ module count_prebufer(
 			count <= 24'b0;
 			end
 		else begin
-			wr_en <= 1'b1;
-			if (!mode) begin
-				count <= count_p - count_m;
-				//wr_en <= 1'b1;
+			if (spi_cmd == 4'd0 && fifo_level < 4'd7) begin
+				count = count + 1'b1;
+				wr_en = 1'b1;
 				end
 			else begin
-				
+				wr_en <= 1'b0;
 				end
 			end
 		end
+		
+
 endmodule

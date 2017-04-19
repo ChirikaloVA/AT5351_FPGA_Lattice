@@ -47,6 +47,8 @@ module testbench_spi();
 		spi_clk_counter <= 8'd0;
 		buffer0 <= 8'h01;	//0x01
 		buffer1 <= 8'h11;	//0x05	  	
+		//buffer0 <= 8'h03;	//0x01
+		//buffer1 <= 8'h01;	//0x05	  	
 		
 		$display("Running 'spi' testbench");
 		//#350 reset <= 1'b1;  
@@ -58,7 +60,7 @@ module testbench_spi();
 		//#400000 trigger = 1'b1;
 		//#1240000 trigger = 1'b0;
 
-
+		//#400000 $stop;
 		#1000000 $stop;
 		$display("'spi' testbench stopped");
 		end
@@ -77,8 +79,9 @@ module testbench_spi();
 	
 	
 	always  begin
-		#(4000) spi_cs <= 1'b0;
-		#(20000) spi_cs <= 1'b1;  
+		#(4000) spi_cs <= 1'b0;	 
+		if (buffer0 == 8'h05) #(54000) spi_cs <= 1'b1;
+		else #(20000) spi_cs <= 1'b1;  
 		//buffer1 <= buffer1 + 8'b1;	   
 		//if (buffer1 == 8'hF) begin 
 //			buffer0 <= buffer0 + 8'b1;
@@ -158,50 +161,65 @@ module testbench_spi();
 							buffer0 <= 8'h04;
 							#(1500) $display("all off");
 							end
-					endcase
+					endcase	
+			8'h04:  buffer0 <= 8'h05;
+			8'h05:  buffer0 <= 8'h05;
 			endcase
 	end	
 		
 	reg [4:0] i = 0;
 	
 	always @(posedge clk_12mhz or negedge spi_cs) begin
-		if (!spi_cs) begin
+		if (!spi_cs) begin	
 			if (spi_divider >= SPI_SPEED) begin	 
-				if (i==0) begin
-					if (spi_clk_counter == 8 && !spi_clk) begin
-						#5 spi_divider <= 0 ;
-						#1000 	  spi_clk_counter <= 0;	 
-						i <= 1;
+				
+				if (spi_clk_counter == 8 && !spi_clk) begin
+					#5 spi_divider <= 0 ;
+					#1000 	  spi_clk_counter <= 0;	 
+					i <= i + 1;
 					end	
-					else begin
-						#5 spi_divider <= 0;
-						#105 spi_clk <= ~spi_clk;
-						if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
+				else begin
+					#5 spi_divider <= 0;
+					#105 spi_clk <= ~spi_clk;
+					if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
 					end
-				end
-				else if (i==1) begin  
-					if (spi_clk_counter == 8 && !spi_clk) begin
-						#5 spi_divider <= 0 ;
-						#1000 	  spi_clk_counter <= 0;	 
-						i <= 2;
-					end	
-					else begin
-						#5 spi_divider <= 0;
-						#105 spi_clk <= ~spi_clk;
-						if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
-					end
-				end
-				else if (i==2) begin  
-					if (spi_clk_counter == 8 && !spi_clk) begin
-						#5 spi_divider <= 0 ;
-						i <= 0;
-					end	
-					else begin
-						#5 spi_divider <= 0;
-						#105 spi_clk <= ~spi_clk;
-						if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
-					end
-				end				
+				
+				
+				//if (i==0) begin
+//					if (spi_clk_counter == 8 && !spi_clk) begin
+//						#5 spi_divider <= 0 ;
+//						#1000 	  spi_clk_counter <= 0;	 
+//						i <= 1;
+//					end	
+//					else begin
+//						#5 spi_divider <= 0;
+//						#105 spi_clk <= ~spi_clk;
+//						if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
+//					end
+//				end
+//				else if (i==1) begin  
+//					if (spi_clk_counter == 8 && !spi_clk) begin
+//						#5 spi_divider <= 0 ;
+//						#1000 	  spi_clk_counter <= 0;	 
+//						i <= 2;
+//					end	
+//					else begin
+//						#5 spi_divider <= 0;
+//						#105 spi_clk <= ~spi_clk;
+//						if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
+//					end
+//				end
+//				else if (i==2) begin  
+//					if (spi_clk_counter == 8 && !spi_clk) begin
+//						#5 spi_divider <= 0 ;
+//						i <= 0;
+//					end	
+//					else begin
+//						#5 spi_divider <= 0;
+//						#105 spi_clk <= ~spi_clk;
+//						if (spi_clk) #5 spi_clk_counter <= spi_clk_counter + 8'd1;
+//					end
+//				end				
 		
 			end					   
 					
@@ -211,7 +229,7 @@ module testbench_spi();
 		else begin 
 			spi_clk <= 1'b0;
 			spi_divider <= 8'd0;
-			spi_clk_counter <= 8'd0;  
+			spi_clk_counter <= 8'd8;  
 			i <= 5'd0;  
 			
 		end	 
@@ -220,8 +238,8 @@ module testbench_spi();
 		
 		
 	always @(posedge spi_clk) begin	 
-		if (i==0) spi_mosi <= buffer0>>(8'd7 - spi_clk_counter);
-		else if (i==1)	begin
+		if (i==1) spi_mosi <= buffer0>>(8'd7 - spi_clk_counter);
+		else if (i==2)	begin
 			spi_mosi <= buffer1>>(8'd7 - spi_clk_counter);
 			end
 		end
@@ -263,9 +281,9 @@ module testbench_spi();
 		.pos_comparator(),
 		.neg_comparator(),
 		.ref_avk(),
-		.antibounce(),
+		.antibounce()
 		
-		.cnt_choise()
+		//.cnt_choise()
 		);
 
 

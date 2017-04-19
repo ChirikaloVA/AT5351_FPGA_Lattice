@@ -34,9 +34,9 @@ module top(
 		input wire pos_comparator,
 		input wire neg_comparator,
 		output wire ref_avk,
-		output wire antibounce,
+		output wire antibounce
 		
-		input wire cnt_choise
+		//input wire cnt_choise
 		) /* synthesis GSR = "ENABLED" */	;
 
 
@@ -44,6 +44,8 @@ module top(
 	wire reset;
 	wire rst_sync;
 	assign reset = ~rst;
+	
+
 	
 	PUR PUR_INST (.PUR (PURNET));
 	defparam PUR_INST.RST_PULSE = 100;	
@@ -108,7 +110,7 @@ module top(
 	wire cnt_in;
 	wire cnt_en;
 	count_choise COUNT_CHOISE(
-		.cnt_choise	(cnt_choise),
+		.count_mode	(count_mode),
 		.count1		(adc_count),
 		.enable1	(1'b1),
 		.count2		(ref_avk),
@@ -130,15 +132,39 @@ module top(
 
 	wire [23:0] count;
 	wire fifo_wr_en;
-	wire fifo_rd_en;
+	reg fifo_rd_en;
+	wire fifo_rd_en_w;
+
+	
+	
 	wire [23:0] fifo_out;
+	
+	wire spi_xfer_done;
+	reg [3:0] fifo_level;
+	reg [7:0] fifo_buffer_out [0:2];
+	wire [7:0] fifo_buffer_out_w2;
+	wire [7:0] fifo_buffer_out_w1;
+	wire [7:0] fifo_buffer_out_w0;
+	
+	
+	reg [1:0] fifo_buffer_out_count;
+	reg reading_fifo;
+	
+	wire read_meas_data;
+	reg [7:0] meas_data;
+	
+	wire [3:0] spi_cmd;
+	
+	
 	count_prebufer COUNT_PREBUFFER (
 		.clk_12mhz(clk_12mhz),
-		.mode(cnt_choise),
+		.mode(count_mode),
 		.count_m(count_m),
 		.count_p(count_p),
 		.count(count),
 		.wr_en(fifo_wr_en),
+		.spi_cmd(spi_cmd),
+		.fifo_level(fifo_level),
 		.reset(rst_sync)
 		);
 	
@@ -147,7 +173,7 @@ module top(
 		.WrClock(clk_12mhz), 
 		.RdClock(clk_12mhz), 
 		.WrEn(fifo_wr_en), 
-		.RdEn(fifo_rd_en), 
+		.RdEn(fifo_rd_en_w), 
 		.Reset(rst_sync), 
 		.RPReset(rst_sync), 
 		.Q(fifo_out), 
@@ -156,6 +182,97 @@ module top(
 		.AlmostEmpty(), 
 		.AlmostFull()
 		);
+
+
+	wire spi_bit_3;
+	reg fifo_rd_en_buf0;
+	reg fifo_rd_en_buf1;
+	reg fifo_rd_en_buf2;
+	
+	assign fifo_rd_en_w = (read_meas_data && !fifo_buffer_out_count) ? 1 : 0;	
+	
+	
+	always @(posedge clk_12mhz or posedge rst_sync)
+		if (rst_sync) fifo_rd_en_buf0 <= 1'b0;
+ 		else fifo_rd_en_buf0 <= fifo_rd_en_w;
+	
+	always @(posedge clk_12mhz or posedge rst_sync)
+		if (rst_sync) fifo_rd_en_buf1 <= 1'b0;
+ 		else fifo_rd_en_buf1 <= fifo_rd_en_buf0;
+	
+	always @(posedge clk_12mhz or posedge rst_sync)
+		if (rst_sync) fifo_rd_en_buf2 <= 1'b0;
+ 		else fifo_rd_en_buf2 <= fifo_rd_en_buf1;
+
+	reg read_meas_data_buf0;
+	always @(posedge clk_12mhz or posedge rst_sync)
+		if (rst_sync) read_meas_data_buf0 <= 1'b0;
+ 		else read_meas_data_buf0 <= read_meas_data;
+	
+	assign fifo_buffer_out_w2 = (fifo_rd_en_buf1) ? fifo_out[23:16] : fifo_buffer_out[2];
+	assign fifo_buffer_out_w1 = (fifo_rd_en_buf1) ? fifo_out[15:8] : fifo_buffer_out[1];
+	assign fifo_buffer_out_w0 = (fifo_rd_en_buf1) ? fifo_out[7:0] : fifo_buffer_out[0];
+	
+	//assign meas_data = (fifo_buffer_out_count == 2'd0) ? fifo_buffer_out_w0 : (fifo_buffer_out_count == 2'd1) ? fifo_buffer_out_w1 : (fifo_buffer_out_count == 2'd2) ? fifo_buffer_out_w2;
+	
+	always @(posedge clk_12mhz or posedge rst_sync) begin
+		if (rst_sync) begin
+			fifo_level <= 4'd0;
+			reading_fifo <= 1'b0;
+			fifo_buffer_out_count <= 2'd0;
+			fifo_rd_en <= 1'b0;
+ 			//fifo_wr_en <= 1'b0;
+ 			end
+		else begin
+			if (fifo_wr_en && fifo_level < 4'd15) fifo_level <= fifo_level + 4'd1;
+			if (fifo_rd_en_w && fifo_level > 4'd0) fifo_level <= fifo_level - 4'd1;
+			
+			if (read_meas_data && !fifo_buffer_out_count) begin
+				//fifo_rd_en <= 1'b1;
+				reading_fifo <= 1'b1;
+				end
+
+			else if (read_meas_data_buf0 && fifo_buffer_out_count < 2'd2 && fifo_buffer_out_count) begin
+				meas_data <= fifo_buffer_out[fifo_buffer_out_count];
+				reading_fifo <= 1'b1;
+				
+				end
+			else if (read_meas_data_buf0 && fifo_buffer_out_count == 2'd2) begin
+				meas_data <= fifo_buffer_out[fifo_buffer_out_count];
+				reading_fifo <= 1'b1;
+				
+				
+				//fifo_rd_en <= 1'b1;
+				//fifo_buffer_out[2] <= fifo_out[23:16];
+				//fifo_buffer_out[1] <= fifo_out[15:8];
+				//fifo_buffer_out[0] <= fifo_out[7:0];
+				end
+			//else if (!read_meas_data) fifo_rd_en <= 1'b0;
+				
+			//else if (fifo_rd_en) begin
+				//fifo_rd_en <= 1'b0;
+				//end
+			else if (fifo_rd_en_buf1) begin
+				fifo_buffer_out[2] <= fifo_out[23:16];
+				fifo_buffer_out[1] <= fifo_out[15:8];
+				fifo_buffer_out[0] <= fifo_out[7:0];
+				//meas_data <= fifo_out[7:0];
+				//fifo_buffer_out_count <= fifo_buffer_out_count + 2'd1;
+				end
+			else if (fifo_rd_en_buf2) begin
+				meas_data <= fifo_buffer_out[0];
+				//fifo_buffer_out_count <= fifo_buffer_out_count + 2'd1;
+				end	
+				
+			if (read_meas_data && fifo_buffer_out_count < 2'd2) begin
+				fifo_buffer_out_count <= fifo_buffer_out_count + 2'd1;
+				end
+			else if (read_meas_data && fifo_buffer_out_count == 2'd2) begin
+				fifo_buffer_out_count <= 2'd0;
+				end	
+			if (spi_xfer_done) fifo_buffer_out_count <= 2'd0;
+			end
+		end
 
 /*	highvoltage HV_not_ready(
 		.clk(clk_12mhz),
@@ -199,7 +316,7 @@ module top(
 	wire       wb_xfer_req;
 	
 	wire 	   spi_irq;
-
+    
 	
 	assign wb_clk_i = clk_12mhz;
 	assign wb_rst_i = rst_sync;
@@ -246,6 +363,8 @@ module top(
 		.clk            (clk_12mhz    ),
 		.rst_n          (rst_sync     ),
 		.spi_csn        (spi_cs       ),
+		.spi_clk        (spi_clk      ),
+		.spi_bit_3      (spi_bit_3    ),
 		.address        (address      ), 
 		.wr_en          (wr_en        ),
 		.wr_data        (wr_data      ),
@@ -253,7 +372,8 @@ module top(
 		.rd_data        (rd_data      ),
 		.wb_xfer_done   (wb_xfer_done ),
 		.wb_xfer_req    (wb_xfer_req  ),
-
+		.spi_xfer_done	(spi_xfer_done),
+		
 		.input_sel	(input_sel),
 		.mu_sel		(mu_sel),
 		.avk_sel	(avk_sel),
@@ -263,8 +383,12 @@ module top(
 		.fil2_sel	(fil2_sel),
 		.relay_reset(relay_reset),
 		.cs_out	({relay_cs, comp2_cs, comp1_cs}),
-		.fifo_data(fifo_out),
-		.fifo_rd_en(fifo_rd_en)
+		.fifo_data(fifo_out),//		.fifo_rd_en(fifo_rd_en),
+		.count_mode(count_mode),
+		.read_meas_data(read_meas_data),
+		.meas_data(meas_data),
+		.fifo_level(fifo_level),
+		.spi_cmd(spi_cmd)
 		)/* synthesis syn_noprune = 1 */;
 	
 endmodule

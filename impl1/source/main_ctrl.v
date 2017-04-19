@@ -63,17 +63,18 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     input  wire                            clk,          // System clock
     input  wire                            rst_n,        // System reset
     input  wire                            spi_csn,      // Hard SPI chip-select (active low)
-    output reg  [7:0]                      address,      // Local address for the WISHBONE interface
+    input  wire							   spi_clk,
+	output reg  						   spi_bit_3,
+	output reg  [7:0]                      address,      // Local address for the WISHBONE interface
     output reg                             wr_en,        // Local write enable for the WISHBONE interface
     output reg  [7:0]                      wr_data,      // Local write data for the WISHBONE interface        
     output reg                             rd_en,        // Local read enable for the WISHBONE interface          
     input  wire [7:0]                      rd_data,      // Local read data for the WISHBONE interface          
     input  wire                            wb_xfer_done, // WISHBONE transfer done    
     input  wire                            wb_xfer_req,   // WISHBONE transfer request 
-    //output reg                             en_port,      // Genaral purpose enable port
-    //output reg                             gpi_ld,       // GPI latch
-    //output reg                             gpio_wr,      // GPIO write (high) and read (low)
-    //output reg  [7:0]                      gpio_addr,    // GPIO port address                     
+	output wire       					   spi_xfer_done,     // SPI transmitting complete (1: complete, 0: in progress) 
+    
+
     output reg	[3:0]						input_sel,
 	output reg	[2:0]						mu_sel,
 	output reg	[3:0]						avk_sel,
@@ -84,15 +85,14 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
 	
 	output wire  [2:0]       				cs_out,    // GPIO port output data bus
 	input wire [23:0] 						fifo_data,
-	output reg								fifo_rd_en
-    //input  wire [GPI_DATA_WIDTH-1:0]       gpio_din,     // GPIO port input data bus
-    //output reg                             mem_wr,       // Memory write (high) and read (low)
-    //output reg  [MEM_ADDR_WIDTH-1:0]       mem_addr,     // Memory address
-    //output reg  [7:0]                      mem_wdata,    // Memory write data bus
-    //input  wire [7:0]                      mem_rdata,    // Memory read data bus
-    //input  wire [IRQ_NUM-1:0]              irq_status,   // IRQ status     
-    //output reg  [IRQ_NUM-1:0]              irq_en,       // IRQ enable
-    //output reg  [IRQ_NUM-1:0]              irq_clr       // IRQ clear
+//	output reg								fifo_rd_en,
+	
+	output reg								count_mode,
+	output reg								read_meas_data,
+	input wire [7:0] 						meas_data,
+	input wire [3:0]						fifo_level,
+	output reg  [3:0] 						spi_cmd           // The slim buffer version of the SPI command used for the performance 
+    
     );
     
 	
@@ -146,21 +146,22 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     reg        spi_csn_buf0_p;    // The postive-egde sampling of spi_csn
     reg        spi_csn_buf1_p;    // The postive-egde sampling of spi_csn_buf0_p 
     reg        spi_csn_buf2_p;    // The postive-egde sampling of spi_csn_buf1_p
+    reg        spi_clk_buf0_p;    // The postive-egde sampling of spi_clk
+    reg        spi_clk_buf1_p;    // The postive-egde sampling of spi_clk_buf0_p 
+	reg [2:0]  spi_clk_cnt;		  // Bit counter of SPI transfer
     wire       spi_cmd_start;     // A new SPI command start
     reg        spi_cmd_start_reg; // The buffer of a new SPI command start
     reg        spi_idle;          // SPI IDLE signal    
-    reg  [3:0] spi_cmd;           // The slim buffer version of the SPI command used for the performance 
     wire       spi_rx_rdy;        // SPI receive ready    
     wire       spi_tx_rdy;        // SPI transmit ready             
-    wire       spi_xfer_done;     // SPI transmitting complete (1: complete, 0: in progress) 
     //reg  [7:0] mem_burst_cnt;
 
 	reg [3:0] 	spi_byte_counter;	
 
-    reg [7:0] meas_state;
-    reg [7:0] meas_data;
-
-
+    wire [7:0] meas_state;
+    assign meas_state = {2'b00, count_mode, ~count_mode, fifo_level[3:0]};
+	
+	
 	assign cs_out[2:0] = spi_csn_buf0_p ? cs_dout[2:0] : 3'b111;
 
     // Bufferring spi_csn with postive edge                    
@@ -184,6 +185,46 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
        else
           spi_csn_buf2_p <= spi_csn_buf1_p;
        
+	   
+	   
+    // Bufferring spi_clk with postive edge                    
+    always @(posedge clk or posedge rst_n)
+       if (rst_n)spi_clk_buf0_p <= 1'b0;
+       else      spi_clk_buf0_p <= spi_clk;	   
+
+	// Bufferring spi_clk_buf0_p with postive edge                    
+    always @(posedge clk or posedge rst_n)
+       if (rst_n) spi_clk_buf1_p <= 1'b0;
+       else       spi_clk_buf1_p <= spi_clk_buf0_p;	   
+
+
+	reg [2:0] spi_clk_cnt_prev;
+	// Bit counter for spi transfer              
+    always @(posedge spi_clk_buf1_p or posedge rst_n)
+       if (rst_n) spi_clk_cnt <= 3'b0;
+       else begin  
+		  if (spi_csn_buf1_p == 1'b0) spi_clk_cnt <= spi_clk_cnt + 3'b1;	  
+	      else spi_clk_cnt <= 3'b0;
+		  
+		  end
+
+
+	
+	always @(posedge clk or posedge rst_n) begin
+		if (rst_n) begin
+			spi_bit_3 <= 1'b0;
+			spi_clk_cnt_prev <= 3'b0;
+			end
+		else begin
+			if (spi_clk_cnt_prev != spi_clk_cnt) spi_clk_cnt_prev <= spi_clk_cnt;
+			
+			if (spi_clk_cnt_prev != spi_clk_cnt && spi_clk_cnt == 3'd3) spi_bit_3 <= 1'b1;
+			else spi_bit_3 <= 1'b0;	
+			
+			end
+		end
+
+
     // Generate SPI command start buffer signal                 
     always @(posedge clk or posedge rst_n)
        if (rst_n)
@@ -212,6 +253,8 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
     assign spi_rx_rdy = rd_data[3] ? 1'b1 : 1'b0;
     assign spi_tx_rdy = rd_data[4] ? 1'b1 : 1'b0;
     
+
+	
   //The main state machine with its output registers      
     always @(posedge clk or posedge rst_n)
        if (rst_n) begin
@@ -228,11 +271,16 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
           fil1_sel <= 1'b0;       
           fil2_sel <= 1'b1;       
           cs_dout <= 3'b111;
-
+		  
+		  count_mode <= 1'b0;
+		  read_meas_data <= 1'b0;
+		  
        end else begin
           rd_en <= 1'b0;
           wr_en <= 1'b0;
           address <= `SPITXDR;
+		  
+		  read_meas_data <= 1'b0;
           
           case (main_sm)
           // IDLE state
@@ -315,13 +363,17 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                                           main_sm <= `S_ADDR_ST;     // Go to `S_IDLE state when the SPI command is Enable
                                           wr_en <= 1'b1; 
                                           address <= `SPITXDR; 
-                                          wr_data <= meas_state;
+                                          //wr_data <= meas_state;
                                        end                                     
                           `MEAS_DATA:   begin 
                                           main_sm <= `S_ADDR_ST;     // Go to `S_IDLE state when the SPI command is Enable
                                           wr_en <= 1'b1; 
                                           address <= `SPITXDR; 
-                                          wr_data <= meas_data;
+										  
+										  //if (spi_cmd == `MEAS_DATA && spi_bit_3) read_meas_data <= 1'b1;
+                              
+										  //read_meas_data <= 1'b0;
+                                          //wr_data <= meas_data;
                                        end                                     
                           `SETTINGS:     begin 
                                           main_sm <= `S_ADDR_ST;     // Go to `S_IDLE state when the SPI command is Enable
@@ -368,7 +420,7 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                               rd_en <= 1'b1;                        
                               address <= `SPIRXDR;
                               
-                              if (spi_xfer_done) begin
+							  if (spi_xfer_done) begin
                                  main_sm <= `S_IDLE;           // Go to `S_IDLE state when the current SPI transaction is complete
                                  rd_en <= 1'b0;
                               end   
@@ -383,7 +435,11 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
 						  else if (wb_xfer_done) begin
                              rd_en <= 1'b1;                    // Otherwise, keep read SR register in the current state
                              address <= `SPISR;
-							end  
+							 end
+						  
+						  if (spi_cmd == `MEAS_DATA && spi_bit_3) read_meas_data <= 1'b1;
+                              
+							
                        end 
           // For GPIO/memory commands, load address.
           // For IRQ_ST/REV_ID commands, go to `S_IDLE state.                
@@ -531,7 +587,22 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
 												end
 										  default: wr_data <= 8'h00;
 										  endcase
-                                       end 								   
+                                       end 		
+						  `MEAS_STATE: begin
+										main_sm <= `S_WDATA_ST;     // Go to `S_IDLE state when the SPI command is Write GPO
+										wr_en <= 1'b1;
+										address <= `SPITXDR;
+										wr_data <= meas_state;
+										end
+						  `MEAS_DATA: begin
+										main_sm <= `S_WDATA_ST;     // Go to `S_IDLE state when the SPI command is Write GPO
+										wr_en <= 1'b1;
+										address <= `SPITXDR;
+										
+										wr_data <= meas_data;
+										//wr_data <= 8'h55;
+										end
+						  
                           default:     main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is Revision ID                              
                           endcase
                        end
@@ -543,13 +614,16 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                              main_sm <= `S_DATA_WR;            // Go to `S_DATA_WR state when the SPI write data is ready in the RXDR register
                              rd_en <= 1'b1;                        
                              address <= `SPIRXDR;
+							 
                           end else if (wb_xfer_done && spi_xfer_done)   
                              main_sm <= `S_IDLE;               // Go to `S_IDLE state when the SPI transfer is complete
                           else if (wb_xfer_done) begin
                              rd_en <= 1'b1;                    // Otherwise, keep read SR register in the current state
                              address <= `SPISR;
+							 
                           end  
-                 
+							
+						  if (spi_cmd == `MEAS_DATA && spi_bit_3) read_meas_data <= 1'b1;
     
                        end
 					   
@@ -574,7 +648,11 @@ module main_ctrl #(parameter GPI_PORT_NUM = 4,           // GPI port number
                                           //meas_state <= rd_data[3:0]; 
                                        end  
                           `MEAS_DATA:     begin 
-                                          main_sm <= `S_IDLE;     // Go to `S_IDLE state when the SPI command is Write GPO
+                                          main_sm <= `S_WDATA_ST;     // Go to `S_IDLE state when the SPI command is Write GPO
+										  wr_en <= 1'b1;
+										  address <= `SPITXDR;
+										
+										  wr_data <= meas_data;
                                           //meas_data <= rd_data[0:0]; 
                                        end  
                           `SETTINGS:     begin 
