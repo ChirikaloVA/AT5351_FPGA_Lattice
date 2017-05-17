@@ -3,6 +3,7 @@
 module testbench_spi();
 	reg clk_12mhz;
 	reg reset;
+	reg counter;
 	
 	wire [23:0] count_p; 
 	wire [23:0] count_m;
@@ -37,7 +38,8 @@ module testbench_spi();
 		clk_12mhz <= 1'b0;
 		reset <= 1'b1;
 		//trigger <= 1'b0;	
-
+		counter <= 1'b1;
+		
 		spi_clk <= 1'b0;
 		spi_cs <= 1'b1;
 		spi_mosi <= 1'b0;
@@ -45,10 +47,10 @@ module testbench_spi();
 		//spi_miso <= 1'b1;
 		spi_divider <= 8'd0;
 		spi_clk_counter <= 8'd0;
-		buffer0 <= 8'h01;	//0x01
-		buffer1 <= 8'h11;	//0x05	  	
-		//buffer0 <= 8'h03;	//0x01
-		//buffer1 <= 8'h01;	//0x05	  	
+	//	buffer0 <= 8'h01;	0x01
+//		buffer1 <= 8'h11;	//0x05	  	
+		buffer0 <= 8'h04;	//0x01
+		buffer1 <= 8'h01;	//0x05	  	
 		
 		$display("Running 'spi' testbench");
 		//#350 reset <= 1'b1;  
@@ -80,7 +82,7 @@ module testbench_spi();
 	
 	always  begin
 		#(4000) spi_cs <= 1'b0;	 
-		if (buffer0 == 8'h05) #(54000) spi_cs <= 1'b1;
+		if (buffer0 == 8'h05) #(60000) spi_cs <= 1'b1;
 		else #(20000) spi_cs <= 1'b1;  
 		//buffer1 <= buffer1 + 8'b1;	   
 		//if (buffer1 == 8'hF) begin 
@@ -244,14 +246,21 @@ module testbench_spi();
 			end
 		end
 
-
-
+	always begin
+		//#3333000 counter <= ~counter;
+//		#3333 counter <= ~counter;
+//		#6667 counter <= ~counter;
+		#20000 counter <= ~counter;
+		#10000 counter <= ~counter;
+		end
+		
+	
 	top top(
 		.clk_12mhz(clk_12mhz), 
 		.clk_4mhz(), 
 		.clk_5ms(), 
 		.clk_not_5ms(), 
-		.adc_comp(), 
+		.adc_comp(counter), 
 		.adc_countn(), 
 		.spi_clk(spi_clk_wire), 
 		.spi_mosi(spi_mosi_wire), 

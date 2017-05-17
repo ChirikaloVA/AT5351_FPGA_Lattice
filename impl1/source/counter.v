@@ -63,8 +63,10 @@ module counter(
 		input wire clk_4mhz,
 		input wire cnt,
 		input wire en,
-		output wire [23:0] count_p,
-		output wire [23:0] count_m,
+		output wire [22:0] count_p,
+		output wire [22:0] count_m,
+		output wire risingedge,
+		output wire fallingedge,
 		input wire reset
 		);
 		
@@ -74,49 +76,55 @@ module counter(
 	wire cnt_risingedge = (cnt_sync[2:1]==2'b01);  // сейчас мы можем детектировать фронты
 	wire cnt_fallingedge = (cnt_sync[2:1]==2'b10);  // и спады
 	
-	//Регистры счетчика
-	reg [23:0] p = 24'd0;
-	reg [23:0] m = 24'd0;			
-	reg [23:0] cnt_p = 24'b0;
-	reg [23:0] cnt_m = 24'b0;
-	assign count_p = cnt_p;
-	assign count_m = cnt_m;
+	assign risingedge = cnt_risingedge;
+	assign fallingedge = cnt_fallingedge;
 	
-	initial begin
-		cnt_p <= 24'b0;
-		cnt_m <= 24'b0;
-		end
+	//Регистры счетчика
+	reg [22:0] p /* synthesis syn_keep*/;
+	reg [22:0] m /* synthesis syn_keep*/;	
+	//output reg [22:0] count_p;
+	//output reg [22:0] count_m;
+
+	reg [22:0] cnt_p /* synthesis syn_keep*/;
+	reg [22:0] cnt_m /* synthesis syn_keep*/;
+	assign count_p = cnt_p ;
+	assign count_m = cnt_m ;
+	
+	//initial begin
+		//cnt_p <= 24'b0;
+		//cnt_m <= 24'b0;
+		//end
 	
 
 	always @(posedge clk_4mhz or posedge reset) begin
 		if (reset) begin
-			p <= 24'd0;
-			m <= 24'd0;
+			p <= 23'd0;
+			m <= 23'd0;
 			end
 		else begin
 			if (en) begin
-				if (cnt) p <= p + 24'b1;
-				else m <= m + 24'b1;
+				if (cnt) p <= p + 23'b1;
+				else if (!cnt) m <= m + 23'b1;
 					
 				//Введена задержка обнуления счетчиков, для уверенного сохранения 
 				//содержимого счетчика
-				if (cnt_sync == 3'b111) m <=0 ;
-				if (cnt_sync == 3'b000) p <=0 ;
+				if (cnt_sync == 3'b111) m <= 23'b0 ;
+				if (cnt_sync == 3'b000) p <= 23'b0 ;
 				end
 			end
 		end
 
 	//Сохранение значение счетчика низкого уровня входного сигнала
-	always @(posedge reset or posedge cnt_risingedge) begin
-		if (reset) cnt_m <= 24'b0;
+	always @(posedge clk_12mhz or posedge reset) begin
+		if (reset) cnt_m <= 23'b0;
 		else begin 
 			if (cnt_risingedge) cnt_m <= m;
 			end
 		end
 		
 	//Сохранение значение счетчика высокого уровня входного сигнала
-	always @(posedge reset or posedge cnt_fallingedge) begin
-		if (reset) cnt_p <= 24'b0;
+	always @(posedge clk_12mhz or posedge reset) begin
+		if (reset) cnt_p <= 23'b0;
 		else begin
 			if (cnt_fallingedge) cnt_p <= p;
 			end
@@ -148,26 +156,21 @@ module count_choise(
 		output wire enable
 		);
 		
-	reg cnt_in = 1'b0;
-	reg cnt_en = 1'b0;
-	assign count = cnt_in;
-	assign enable = cnt_en;
-	
-	initial begin
-		cnt_in = 1'b0;
-		cnt_en = 1'b0;
-		end
 		
-	always @(*) begin
-		if (count_mode) begin
-			cnt_in = count2;
-			cnt_en = enable2;
-			end
-		else begin
-			cnt_in = count1;
-			cnt_en = enable1;
-			end
-		end	
+	assign count = count_mode ? count2 : count1;
+	assign enable = count_mode ? enable2 : enable1;
+	
+	
+	//always @(*) begin
+		//if (count_mode) begin
+			//cnt_in = count2;
+			//cnt_en = enable2;
+			//end
+		//else begin
+			//cnt_in = count1;
+			//cnt_en = enable1;
+			//end
+		//end	
 
 endmodule
 
@@ -175,33 +178,38 @@ endmodule
 module count_prebufer(
 		input wire clk_12mhz,
 		input wire mode,
-		input wire [23:0] count_m,
-		input wire [23:0] count_p,
+		input wire [22:0] count_m,
+		input wire [22:0] count_p,
 		output reg [23:0] count,
 		output reg wr_en,
+		output reg rd_en,
 		input wire [3:0] spi_cmd,
+		input wire fifo_full,
 		input wire [3:0] fifo_level,
 		input wire reset
 		);
 	
 	initial begin
-		wr_en <= 1'b0;
+		wr_en <= 1'b1;
+		rd_en <= 1'b0;
 		count <= 24'b0;
 		end
 		
 	always @(posedge clk_12mhz or posedge reset) begin
 		if (reset) begin
-			wr_en <= 1'b0;
+			wr_en <= 1'b1;
+			rd_en <= 1'b0;
 			count <= 24'b0;
 			end
 		else begin
-			if (spi_cmd == 4'd0 && fifo_level < 4'd7) begin
-				count = count + 1'b1;
-				wr_en = 1'b1;
-				end
-			else begin
-				wr_en <= 1'b0;
-				end
+			if (!mode) count <= count_p - count_m;
+
+
+			/*	Если буфер FIFO наполняется до предела, необходимо прочесть один байт,
+				чтобы при обращении мастера в буфере были актуальные данные
+			*/
+			if (fifo_full && !rd_en && fifo_level == 4'd8) rd_en <= 1'b1;
+			else rd_en <= 1'b0;
 			end
 		end
 		

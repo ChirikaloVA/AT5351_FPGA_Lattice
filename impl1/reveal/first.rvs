@@ -1,4 +1,4 @@
-<Project ModBy="Inserter" Name="D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/reveal/first.rvl" Date="2017-03-15">
+<Project ModBy="Inserter" Name="D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/reveal/first.rvl" Date="2017-05-16">
     <Core Name="top_LA0">
         <Setting>
             <Capture SamplesPerTrig="1" NumTrigsCap=""/>
@@ -7,13 +7,16 @@
         </Setting>
         <Dataset Name="Base">
             <Trace>
-                <Sig Name="clk_4mhz"/>
-                <Sig Name="clk_5ms"/>
+                <Bus Name="input_sel" Radix="0">
+                    <Sig Name="input_sel:0"/>
+                    <Sig Name="input_sel:1"/>
+                    <Sig Name="input_sel:2"/>
+                    <Sig Name="input_sel:3"/>
+                </Bus>
             </Trace>
             <Trigger>
-                <TU Operator="0" Name="div" ID="1" Value="1" Radix="0"/>
-                <TU Operator="6" Name="ms" ID="2" Value="1" Radix="0"/>
-                <TE Enable="1" Expression="div THEN ms" Name="TE1" ID="1"/>
+                <TU Operator="0" Name="TU1" ID="1" Value="1011" Radix="0"/>
+                <TE Enable="1" Expression="TU1" Name="TE1" ID="1"/>
             </Trigger>
         </Dataset>
     </Core>

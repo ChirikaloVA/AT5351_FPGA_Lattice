@@ -35,6 +35,7 @@ D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/wb_ctrl.v = Veri
 D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/SPI.v = Verilog
 D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/FIFO.v = Verilog
 D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/RAM.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/pmi_ram_dp_0.v = Verilog
 [HDL_Defines]
 SBP_SYNTHESIS=
 [HDL_Param]

@@ -100,3 +100,4 @@ impl1/reveal_workspace
 *.graphml
 impl1/__tsef.v
 .~lock.Список команд.ods#
+*.edf

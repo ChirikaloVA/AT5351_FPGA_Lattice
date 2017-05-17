@@ -10,7 +10,7 @@
  */
 module clock_4mhz(
 		input wire clk_12mhz,
-		output reg clk_4mhz,
+		output wire clk_4mhz,
 		input wire reset
 		);
 	
@@ -47,7 +47,7 @@ module clock_4mhz(
 			end
     end
 
-    always @* clk_4mhz = a^b;
+    assign clk_4mhz = a^b;
 		
 	
 endmodule

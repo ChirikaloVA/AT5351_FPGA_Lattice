@@ -7,7 +7,7 @@
 `timescale 1 ns / 1 ps
 module SPI (wb_clk_i, wb_rst_i, wb_cyc_i, wb_stb_i, wb_we_i, wb_adr_i, 
     wb_dat_i, wb_dat_o, wb_ack_o, spi_clk, spi_miso, spi_mosi, spi_scsn, 
-    spi_irq)/* synthesis NGD_DRC_MASK=1 */;
+    spi_irq, spi_clk_out)/* synthesis NGD_DRC_MASK=1 */;
     input wire wb_clk_i;
     input wire wb_rst_i;
     input wire wb_cyc_i;
@@ -34,6 +34,9 @@ module SPI (wb_clk_i, wb_rst_i, wb_cyc_i, wb_stb_i, wb_we_i, wb_adr_i,
     wire spi_miso_i;
     wire spi_clk_i;
     wire scuba_vlo;
+
+    output wire spi_clk_out;
+    assign spi_clk_out = spi_clk_i;
 
     VHI scuba_vhi_inst (.Z(scuba_vhi));
 
