@@ -290,7 +290,9 @@ module testbench_spi();
 		.pos_comparator(),
 		.neg_comparator(),
 		.ref_avk(),
-		.antibounce()
+		.antibounce(),
+		
+		.rd_data_out()
 		
 		//.cnt_choise()
 		);

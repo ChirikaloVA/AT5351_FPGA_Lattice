@@ -101,3 +101,17 @@ impl1/reveal_workspace
 impl1/__tsef.v
 .~lock.Список команд.ods#
 *.edf
+dpram.ipx
+dpram.v
+dpram_tmpl.v
+impl1/hdr_log
+impl1/reveal/reveal.rva
+impl1/top_temp_lse.sdc
+pmi_ram_dp_0.ipx
+pmi_ram_dp_0.v
+pmi_ram_dp_0_tmpl.v
+pn1494594938.dmp
+tb_dpram_tmpl.v
+tb_pmi_ram_dp_0_tmpl.v
+tc_violations.txt
+timing.ldc

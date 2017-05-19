@@ -267,40 +267,23 @@ module top(
 		);
 */
 
-/*	SPI_slave SPI(
-		.clk(clk), 
-		.SCK(spi_clk), 
-		.MOSI(spi_mosi), 
-		.MISO(spi_miso), 
-		.SSEL(spi_cs), 
-		.count({count_p[23:0], count_m[23:0]}),
-		.reset(reset)
 
-		);	*/
-		
 
 	
-	SPI  SPI (
-		.wb_clk_i	(wb_clk_i), 
-		.wb_rst_i	(wb_rst_i), 
-		.wb_cyc_i	(wb_cyc_i), 
-		.wb_stb_i	(wb_stb_i), 
-		.wb_we_i	(wb_we_i), 
-		.wb_adr_i	(wb_adr_i), 
-		.wb_dat_i	(wb_dat_i), 
-		.wb_dat_o	(wb_dat_o), 
-		.wb_ack_o	(wb_ack_o), 
-		.spi_clk	(spi_clk), 
-		.spi_miso	(spi_miso), 
-		.spi_mosi	(spi_mosi), 
-		.spi_scsn	(spi_cs), 
-		.spi_irq	(spi_irq),
-		.spi_clk_out(spi_clk_out)
-
-		)/* synthesis syn_noprune = 1 */
-		/*synthesis syn_black_box black_box_pad_pin = "spi_clk"*/;
+	SPI_slave  SPI (
+		.clk	(clk_12mhz), 
+		.SCK	(spi_clk), 
+		.MOSI	(spi_mosi), 
+		.MISO	(spi_miso), 
+		.SSEL	(spi_cs), 
+		.rx		(rd_data), 
+		.tx		(wr_data), 
+		.byte_received(wb_xfer_done),
+		.reset	(rst_sync)	
 		
-	
+		)/* synthesis syn_noprune = 1 */;
+		
+/*	
 	wb_ctrl Wisbone_Control(
 		.wb_clk_i	(wb_clk_i), // WISHBONE clock 
 		.wb_rst_i	(wb_rst_i), // WISHBONE reset
@@ -319,18 +302,18 @@ module top(
 		.xfer_done	(wb_xfer_done),// WISHBONE transfer done
 		.xfer_req	(wb_xfer_req)  // WISHBONE transfer request
 		);	
-                                  
+ */                                 
    main_ctrl main_ctrl_inst (
 		.clk            (clk_12mhz    ),
 		.rst_n          (rst_sync     ),
 		.spi_csn        (spi_cs       ),
-		.spi_clk        (spi_clk_out      ),
+		.spi_clk        (spi_clk      ),
 		.spi_bit_3      (spi_bit_3    ),
 		.spi_bit_0      (spi_bit_0    ),
-		.address        (address      ), 
-		.wr_en          (wr_en        ),
+		//.address        (address      ), 
+		//.wr_en          (wr_en        ),
 		.wr_data        (wr_data      ),
-		.rd_en          (rd_en        ),    
+		//.rd_en          (rd_en        ),    
 		.rd_data        (rd_data      ),
 		.wb_xfer_done   (wb_xfer_done ),
 		.wb_xfer_req    (wb_xfer_req  ),
