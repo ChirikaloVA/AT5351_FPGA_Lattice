@@ -6,8 +6,6 @@ impl1/tests/
 impl1/work/
 impl1/DKS_5351_MACHXO2_2000_impl1.dir/
 DKS_5351_MACHXO2_2000.ccl
-DKS_5351_MACHXO2_2000.ldf
-DKS_5351_MACHXO2_2000.lpf
 DKS_5351_MACHXO2_20001.sty
 generate_core.tcl
 generate_ngd.tcl
@@ -99,7 +97,7 @@ doxygen/
 impl1/reveal_workspace
 *.graphml
 impl1/__tsef.v
-.~lock.РЎРїРёСЃРѕРє РєРѕРјР°РЅРґ.ods#
+.~lock.Список команд.ods#
 *.edf
 dpram.ipx
 dpram.v
@@ -115,3 +113,4 @@ tb_dpram_tmpl.v
 tb_pmi_ram_dp_0_tmpl.v
 tc_violations.txt
 timing.ldc
+*.hub
