@@ -32,10 +32,9 @@ D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/capacitance_avk.
 D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/highvoltage.v = Verilog
 D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/main_ctrl.v = Verilog
 D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/wb_ctrl.v = Verilog
-D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/SPI.v = Verilog
+D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/spi_not_efb.v = Verilog
 D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/FIFO.v = Verilog
 D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/RAM.v = Verilog
-D:/DKS-5351/Program/DKS-5351_fpga_for_MACHXO2_2000/pmi_ram_dp_0.v = Verilog
 [HDL_Defines]
 SBP_SYNTHESIS=
 [HDL_Param]
