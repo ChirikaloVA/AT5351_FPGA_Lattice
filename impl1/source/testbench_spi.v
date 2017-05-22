@@ -47,10 +47,10 @@ module testbench_spi();
 		//spi_miso <= 1'b1;
 		spi_divider <= 8'd0;
 		spi_clk_counter <= 8'd0;
-	//	buffer0 <= 8'h01;	0x01
-//		buffer1 <= 8'h11;	//0x05	  	
-		buffer0 <= 8'h04;	//0x01
-		buffer1 <= 8'h01;	//0x05	  	
+		buffer0 <= 8'h01;	//0x01
+		buffer1 <= 8'h11;	//0x05	  	
+	//	buffer0 <= 8'h04;	//0x01
+//		buffer1 <= 8'h01;	//0x05	  	
 		
 		$display("Running 'spi' testbench");
 		//#350 reset <= 1'b1;  

@@ -5,6 +5,7 @@ module main_ctrl (
     rst_n,        // System reset
     spi_csn,      // Hard SPI chip-select (active low)
     spi_clk,
+	wr_data_read,
 	spi_bit_3,
 	spi_bit_0,
 	
@@ -44,6 +45,7 @@ module main_ctrl (
     input  wire    rst_n;        // System reset
     input  wire    spi_csn;      // Hard SPI chip-select (active low)
     input  wire	   spi_clk;
+	output reg     wr_data_read;
 	output reg     spi_bit_3;
 	output reg     spi_bit_0;
 	
@@ -195,10 +197,10 @@ module main_ctrl (
 		else begin
 			if (spi_clk_cnt_prev != spi_clk_cnt) spi_clk_cnt_prev <= spi_clk_cnt;
 			
-			if (spi_clk_cnt_prev != spi_clk_cnt && spi_clk_cnt == 3'd3) spi_bit_3 <= 1'b1;
+			if (spi_clk_cnt_prev != spi_clk_cnt && spi_clk_cnt == 3'd4) spi_bit_3 <= 1'b1;
 			else spi_bit_3 <= 1'b0;	
 			
-			if (spi_clk_cnt_prev != spi_clk_cnt && spi_clk_cnt == 3'd0) spi_bit_0 <= 1'b1;
+			if (spi_clk_cnt_prev != spi_clk_cnt && spi_clk_cnt == 3'd1) spi_bit_0 <= 1'b1;
 			else spi_bit_0 <= 1'b0;	
 			
 			end
@@ -256,10 +258,12 @@ module main_ctrl (
        end else begin
           
 		  read_meas_data <= 1'b0;
-          
+          wr_data_read <= 1'b0;
+		  
           case (main_sm)
           // IDLE state
           `S_IDLE:     if (spi_cmd_start) begin
+						  wr_data <= 8'd0;
                           main_sm <= `S_CMD_LD;            // Go to `S_RSDR_RD state when a new SPI command starts and
                                                             // WISHBONE is ready to transfer
 						end
@@ -310,31 +314,38 @@ module main_ctrl (
                           `SET_OUT:     begin 
                                           main_sm <= `S_ADDR_LD;     // Go to `S_IDLE state when the SPI command is Enable
                                           wr_data <= 8'h00;
+										  wr_data_read <= 1'b1;
                                        end  
                           `READ_OUT:     begin 
                                           main_sm <= `S_ADDR_LD;     // Go to `S_IDLE state when the SPI command is Enable
                                           wr_data <= 8'h00;
+										  wr_data_read <= 1'b1;
                                        end                                     
                           `SEL_SPI:     begin 
                                           main_sm <= `S_ADDR_LD;     // Go to `S_IDLE state when the SPI command is Enable
                                           wr_data <= 8'h00;
+										  wr_data_read <= 1'b1;
                                        end                                     
                           `MEAS_STATE:  begin 
                                           main_sm <= `S_ADDR_LD;     // Go to `S_IDLE state when the SPI command is Enable
                                           wr_data <= 8'h00;
+										  wr_data_read <= 1'b1;
                                           //wr_data <= meas_state;
                                        end                                     
                           `MEAS_DATA:   begin 
                                           main_sm <= `S_ADDR_LD;     // Go to `S_IDLE state when the SPI command is Enable
                                           wr_data <= 8'h00;
+										  wr_data_read <= 1'b1;
 										  //if (spi_cmd == `MEAS_DATA && spi_bit_3) read_meas_data <= 1'b1;
-                              
+										  read_meas_data <= 1'b1;
+										  
 										  //read_meas_data <= 1'b0;
                                           //wr_data <= meas_data;
                                        end                                     
                           `SETTINGS:     begin 
                                           main_sm <= `S_ADDR_LD;     // Go to `S_IDLE state when the SPI command is Enable
                                           wr_data <= 8'd0;
+										  wr_data_read <= 1'b1;
                                        end      
 
                           // `REV_ID:     begin 
@@ -392,7 +403,8 @@ module main_ctrl (
 						  case (spi_cmd) 
                           `SET_OUT:     begin 
 										  main_sm <= `S_DATA_WR; // Go to `S_WDATA_ST state when the SPI command is Write GPO
-                          
+										  wr_data_read <= 1'b1;
+										  
                                           case(rd_data[7:4])
 											//
 											4'h1: begin
@@ -496,6 +508,8 @@ module main_ctrl (
                                        end
                           `READ_OUT:   begin 
 										main_sm <= `S_DATA_WR;     // Go to `S_IDLE state when the SPI command is Write GPO
+										wr_data_read <= 1'b1;
+										
 										case(rd_data[3:0])
 										  4'd1: wr_data <= {4'd0,input_sel};
 										  4'd2:	wr_data <= {5'd0,mu_sel};
@@ -507,6 +521,8 @@ module main_ctrl (
                                        end 
                           `SEL_SPI:   begin 
 										main_sm <= `S_DATA_WR;     // Go to `S_IDLE state when the SPI command is Write GPO
+										wr_data_read <= 1'b1;
+										
 										case(rd_data[3:0])
 										  4'h1: begin 
 												cs_dout <= 3'b110; 
@@ -530,11 +546,14 @@ module main_ctrl (
 						  `MEAS_STATE: begin
 										main_sm <= `S_DATA_WR;     // Go to `S_IDLE state when the SPI command is Write GPO
 										wr_data <= meas_state;
+										wr_data_read <= 1'b1;
 										end
 						  `MEAS_DATA: begin
 										main_sm <= `S_DATA_WR;     // Go to `S_IDLE state when the SPI command is Write GPO
 										
 										wr_data <= meas_data;
+										wr_data_read <= 1'b1;
+										read_meas_data <= 1'b1;
 										//wr_data <= 8'h55;
 										end
 						  
@@ -597,6 +616,8 @@ module main_ctrl (
                                           //main_sm <= `S_TXDR_WR2;     // Go to `S_IDLE state when the SPI command is Write GPO
 										  
 										  wr_data <= meas_data;
+										  wr_data_read <= 1'b1;
+										  read_meas_data <= 1'b1;
                                           //meas_data <= rd_data[0:0]; 
                                        end  
                           `SETTINGS:     begin 

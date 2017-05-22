@@ -114,3 +114,4 @@ tb_pmi_ram_dp_0_tmpl.v
 tc_violations.txt
 timing.ldc
 *.hub
+*.tcl

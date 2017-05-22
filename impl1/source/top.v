@@ -70,7 +70,7 @@ module top(
 	wire read_meas_data;
 	wire [7:0] meas_data;
 	wire [3:0] fifo_level;
-	wire spi_bit_3;
+	wire wr_data_read;
 	wire spi_bit_0;
 	
 	wire fifo_empty; 
@@ -278,6 +278,7 @@ module top(
 		.SSEL	(spi_cs), 
 		.rx		(rd_data), 
 		.tx		(wr_data), 
+		.read_tx(wr_data_read),
 		.byte_received(wb_xfer_done),
 		.reset	(rst_sync)	
 		
@@ -308,6 +309,7 @@ module top(
 		.rst_n          (rst_sync     ),
 		.spi_csn        (spi_cs       ),
 		.spi_clk        (spi_clk      ),
+		.wr_data_read   (wr_data_read ),
 		.spi_bit_3      (spi_bit_3    ),
 		.spi_bit_0      (spi_bit_0    ),
 		//.address        (address      ), 

@@ -24,16 +24,13 @@
         <Source name="impl1/source/wb_ctrl.v" type="Verilog" type_short="Verilog">
             <Options/>
         </Source>
-        <Source name="impl1/source/spi_not_efb.v" type="Verilog" type_short="Verilog" excluded="TRUE">
+        <Source name="impl1/source/spi_not_efb.v" type="Verilog" type_short="Verilog">
             <Options/>
         </Source>
         <Source name="impl1/source/FIFO.ipx" type="IPX_Module" type_short="IPX">
             <Options/>
         </Source>
         <Source name="impl1/source/RAM.ipx" type="IPX_Module" type_short="IPX">
-            <Options/>
-        </Source>
-        <Source name="impl1/source/SPI.ipx" type="IPX_Module" type_short="IPX">
             <Options/>
         </Source>
         <Source name="impl1/source/dividers.v" type="Verilog" type_short="Verilog" excluded="TRUE">
@@ -72,7 +69,7 @@
         <Source name="impl1/impl1.xcf" type="Programming Project File" type_short="Programming">
             <Options/>
         </Source>
-        <Source name="impl1/reveal/first.rvl" type="Reveal" type_short="Reveal">
+        <Source name="impl1/reveal/first.rvl" type="Reveal" type_short="Reveal" excluded="TRUE">
             <Options/>
         </Source>
         <Source name="impl1/tests/antibounce/antibounce.spf" type="Simulation Project File" type_short="SPF">

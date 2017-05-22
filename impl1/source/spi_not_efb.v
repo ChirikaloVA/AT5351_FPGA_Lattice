@@ -1,6 +1,6 @@
 `timescale 1 ns / 1 ns
 
-module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, byte_received, reset) ;
+module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, read_tx, byte_received, reset) ;
 				
 	input clk; 
 	input SCK; 
@@ -9,6 +9,7 @@ module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, byte_received, reset) ;
 	input SSEL; 
 	input wire [7:0] tx;
 	output reg [7:0] rx;
+	input wire read_tx;
 	output wire byte_received;  // high when a byte has been received
 	
 	input reset;
@@ -21,6 +22,12 @@ module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, byte_received, reset) ;
 
 	
 	// sync SCK to the FPGA clock using a 3-bits shift register
+	//reg [2:0] SCKr			/* synthesis syn_keep = 1 */;	  
+	//always @(posedge clk) SCKr <= {SCKr[1:0], SCK};
+	//wire SCK_risingedge = (SCKr[2:1]==2'b01)		/* synthesis syn_keep = 1 */;  // now we can detect SCK rising edges
+	//wire SCK_fallingedge = (SCKr[2:1]==2'b10)		/* synthesis syn_keep = 1 */;  // and falling edges
+
+	// sync SCK to the FPGA clock using a 2-bits shift register
 	reg [2:0] SCKr			/* synthesis syn_keep = 1 */;	  
 	always @(posedge clk) SCKr <= {SCKr[1:0], SCK};
 	wire SCK_risingedge = (SCKr[2:1]==2'b01)		/* synthesis syn_keep = 1 */;  // now we can detect SCK rising edges

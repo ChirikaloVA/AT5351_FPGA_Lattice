@@ -202,7 +202,8 @@ module count_prebufer(
 			count <= 24'b0;
 			end
 		else begin
-			if (!mode) count <= count_p - count_m;
+			//if (!mode) count <= count_p - count_m;
+			if (!mode) count <= {1'b0, count_p};
 
 
 			/*	Если буфер FIFO наполняется до предела, необходимо прочесть один байт,
