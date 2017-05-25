@@ -214,7 +214,8 @@ module main_ctrl (
        else
           if (spi_csn_buf2_p && !spi_csn_buf1_p)
              spi_cmd_start_reg <= 1'b1;
-          else if (main_sm == `S_IDLE || main_sm == `S_RXDR_RD || (!spi_csn_buf2_p && spi_csn_buf1_p))
+          //else if (main_sm == `S_IDLE || main_sm == `S_RXDR_RD || (!spi_csn_buf2_p && spi_csn_buf1_p))
+          else if (!spi_csn_buf2_p && !spi_csn_buf1_p)
              spi_cmd_start_reg <= 1'b0;
     
     // Generate SPI command start signal
@@ -354,8 +355,14 @@ module main_ctrl (
                           //                 address <= `SPITXDR; 
                           //                 wr_data <= REVISION_ID; 
                           //              end
-                          `INVALID:   main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is illegal
-                          default:     main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is illegal
+                          `INVALID:   begin 
+										main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is illegal
+										wr_data <= 8'hFF;
+										end
+                          default:     begin 
+										main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is illegal
+										wr_data <= 8'hFF;
+										end
                           endcase
                   
                           if (spi_xfer_done) begin        
@@ -411,25 +418,25 @@ module main_ctrl (
 													case (rd_data[3:0])
 														4'h1: begin 
 																input_sel <= 4'b1110;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'h2: begin 
 																input_sel <= 4'b1101;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'h3: begin
 																input_sel <= 4'b1011;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'h4: begin
 																input_sel <= 4'b0111;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'hF: begin
 																input_sel <= 4'b1111;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
-														default: wr_data <= 8'h00;
+														default: wr_data <= 8'hFF;
 														endcase
 													
 													end
@@ -437,17 +444,17 @@ module main_ctrl (
 													case (rd_data[3:0])
 														4'h1: begin
 																mu_sel <= 3'b110;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'h2: begin
 																mu_sel <= 3'b101;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'h3: begin
 																mu_sel <= 3'b011;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
-														default: wr_data <= 8'h00;
+														default: wr_data <= 8'hFF;
 														endcase
 													
 													end
@@ -455,25 +462,25 @@ module main_ctrl (
 													case (rd_data[3:0])
 														4'h1: begin 
 																avk_sel <= 4'b1110;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'h2: begin 
 																avk_sel <= 4'b1101;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'h3: begin
 																avk_sel <= 4'b1011;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'h4: begin
 																avk_sel <= 4'b0111;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'hF: begin
 																avk_sel <= 4'b1111;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
-														default: wr_data <= 8'h00;
+														default: wr_data <= 8'hFF;
 														endcase
 													
 													end
@@ -481,41 +488,41 @@ module main_ctrl (
 													case(rd_data[3:0])
 														4'h0: begin
 																fil1_sel <= 1'b1;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'hF: begin
 																fil1_sel <= 1'b0;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
-														default: wr_data <= 8'h00;
+														default: wr_data <= 8'hFF;
 														endcase
 													end
 											4'h5: begin
 													case(rd_data[3:0])
 														4'h0: begin
 																fil2_sel <= 1'b1;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
 														4'hF: begin
 																fil2_sel <= 1'b0;
-																wr_data <= 8'hFF;
+																wr_data <= 8'hAA;
 																end
-														default: wr_data <= 8'h00;
+														default: wr_data <= 8'hFF;
 														endcase
 													end
-											default: wr_data <= 8'h00;
+											default: wr_data <= 8'hFF;
 											endcase
                                        end
                           `READ_OUT:   begin 
 										main_sm <= `S_DATA_WR;     // Go to `S_IDLE state when the SPI command is Write GPO
 										wr_data_read <= 1'b1;
 										
-										case(rd_data[3:0])
-										  4'd1: wr_data <= {4'd0,input_sel};
-										  4'd2:	wr_data <= {5'd0,mu_sel};
-										  4'd3: wr_data <= {4'd0,avk_sel};
-										  4'd4: wr_data <= {7'd0,fil1_sel};
-										  4'd5: wr_data <= {7'd0,fil2_sel};
+										case(rd_data[7:0])
+										  8'd1: wr_data <= {4'd0,input_sel};
+										  8'd2:	wr_data <= {5'd0,mu_sel};
+										  8'd3: wr_data <= {4'd0,avk_sel};
+										  8'd4: wr_data <= {7'd0,fil1_sel};
+										  8'd5: wr_data <= {7'd0,fil2_sel};
 										  default: wr_data <= 8'hFF;
 										  endcase
                                        end 
@@ -523,24 +530,24 @@ module main_ctrl (
 										main_sm <= `S_DATA_WR;     // Go to `S_IDLE state when the SPI command is Write GPO
 										wr_data_read <= 1'b1;
 										
-										case(rd_data[3:0])
-										  4'h1: begin 
+										case(rd_data[7:0])
+										  8'h1: begin 
 												cs_dout <= 3'b110; 
-												wr_data <= 8'hFF;
+												wr_data <= 8'hAA;
 												end 
-										  4'h2:	begin
+										  8'h2:	begin
 												cs_dout <= 3'b101;
-												wr_data <= 8'hFF;
+												wr_data <= 8'hAA;
 												end
-										  4'h3: begin
+										  8'h3: begin
 												cs_dout <= 3'b011;
-												wr_data <= 8'hFF;
+												wr_data <= 8'hAA;
 												end
-										  4'hF: begin
+										  8'hF: begin
 												cs_dout <= 3'b111;
-												wr_data <= 8'hFF;
+												wr_data <= 8'hAA;
 												end
-										  default: wr_data <= 8'h00;
+										  default: wr_data <= 8'hFF;
 										  endcase
                                        end 		
 						  `MEAS_STATE: begin
@@ -557,7 +564,10 @@ module main_ctrl (
 										//wr_data <= 8'h55;
 										end
 						  
-                          default:     main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is Revision ID                              
+                          default:     begin 
+										main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is illegal
+										wr_data <= 8'hFF;
+										end
                           endcase
                       
 					  end

@@ -47,10 +47,10 @@ module testbench_spi();
 		//spi_miso <= 1'b1;
 		spi_divider <= 8'd0;
 		spi_clk_counter <= 8'd0;
-		buffer0 <= 8'h01;	//0x01
-		buffer1 <= 8'h11;	//0x05	  	
-	//	buffer0 <= 8'h04;	//0x01
-//		buffer1 <= 8'h01;	//0x05	  	
+		//buffer0 <= 8'h01;	//0x01
+		//buffer1 <= 8'h11;	//0x05	  	
+		buffer0 <= 8'h00;	//0x01
+		buffer1 <= 8'h00;	//0x05	  	
 		
 		$display("Running 'spi' testbench");
 		//#350 reset <= 1'b1;  
@@ -63,7 +63,7 @@ module testbench_spi();
 		//#1240000 trigger = 1'b0;
 
 		//#400000 $stop;
-		#1000000 $stop;
+		#110000000 $stop;
 		$display("'spi' testbench stopped");
 		end
 
@@ -81,15 +81,20 @@ module testbench_spi();
 	
 	
 	always  begin
-		#(4000) spi_cs <= 1'b0;	 
-		if (buffer0 == 8'h05) #(60000) spi_cs <= 1'b1;
+		//#(50000000) spi_cs <= 1'b0;	 
+//		if (buffer0 == 8'h05) #(72000) spi_cs <= 1'b1;
+//		else #(20000) spi_cs <= 1'b1;  
+		#(500000) spi_cs <= 1'b0;	 
+		if (buffer0 == 8'h05) #(72000) spi_cs <= 1'b1;
 		else #(20000) spi_cs <= 1'b1;  
 		//buffer1 <= buffer1 + 8'b1;	   
 		//if (buffer1 == 8'hF) begin 
 //			buffer0 <= buffer0 + 8'b1;
 //			buffer1 <= 8'b0; 
 //			end		   
-		case(buffer0)
+		case(buffer0)  
+			8'h00: buffer1 <= buffer1 + 8'd1;
+				
 			8'h01: 
 				case(buffer1[7:4])
 					4'h1:
@@ -250,8 +255,8 @@ module testbench_spi();
 		//#3333000 counter <= ~counter;
 //		#3333 counter <= ~counter;
 //		#6667 counter <= ~counter;
-		#20000 counter <= ~counter;
-		#10000 counter <= ~counter;
+		#6000000 counter <= ~counter;
+		#4000000 counter <= ~counter;
 		end
 		
 	

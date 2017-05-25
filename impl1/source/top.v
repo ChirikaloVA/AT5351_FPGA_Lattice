@@ -177,7 +177,7 @@ module top(
 		
 		);
 
-
+	wire fe_count;
 	
 	count_choise COUNT_CHOISE(
 		.count_mode	(count_mode),
@@ -197,7 +197,7 @@ module top(
 		.count_p	(count_p),
 		.count_m	(count_m),
 		.risingedge (prebuf_wr_en),
-		.fallingedge(),
+		.fallingedge(fe_count),
 		.reset		(rst_sync)
 		) /* synthesis syn_noprune = 1 */;
 
@@ -210,6 +210,7 @@ module top(
 		.count_m(count_m),
 		.count_p(count_p),
 		.count(count),
+		.falling_edge(fe_count),
 		.wr_en(),
 		.rd_en(prebuf_rd_en),
 		.spi_cmd(spi_cmd),

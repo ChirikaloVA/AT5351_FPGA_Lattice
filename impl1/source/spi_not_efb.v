@@ -28,10 +28,10 @@ module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, read_tx, byte_received, res
 	//wire SCK_fallingedge = (SCKr[2:1]==2'b10)		/* synthesis syn_keep = 1 */;  // and falling edges
 
 	// sync SCK to the FPGA clock using a 2-bits shift register
-	reg [2:0] SCKr			/* synthesis syn_keep = 1 */;	  
-	always @(posedge clk) SCKr <= {SCKr[1:0], SCK};
-	wire SCK_risingedge = (SCKr[2:1]==2'b01)		/* synthesis syn_keep = 1 */;  // now we can detect SCK rising edges
-	wire SCK_fallingedge = (SCKr[2:1]==2'b10)		/* synthesis syn_keep = 1 */;  // and falling edges
+	reg [1:0] SCKr			/* synthesis syn_keep = 1 */;	  
+	always @(posedge clk) SCKr <= {SCKr[0], SCK};
+	wire SCK_risingedge = (SCKr==2'b01)		/* synthesis syn_keep = 1 */;  // now we can detect SCK rising edges
+	wire SCK_fallingedge = (SCKr==2'b10)		/* synthesis syn_keep = 1 */;  // and falling edges
 
 	// same thing for SSEL
 	reg [2:0] SSELr			/* synthesis syn_keep = 1 */;  
@@ -61,7 +61,7 @@ module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, read_tx, byte_received, res
 				byte_data_received <= 8'd0;
 				end
 			else  begin
-				if(SCK_risingedge) begin
+				if(SCK_fallingedge) begin
 					bitcnt <= bitcnt + 3'b001;
 					// implement a shift-left register (since we receive the data MSB first)
 					//byte_data_received <= {byte_data_received[6:0], MOSI_data};
@@ -75,7 +75,7 @@ module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, read_tx, byte_received, res
 	reg byte_received_buf1;
 	reg byte_received_buf2;
 	wire byte_received_buf0;
-	assign byte_received_buf0 = SSEL_active && SCK_risingedge && (bitcnt==3'b111);
+	assign byte_received_buf0 = SSEL_active && SCK_fallingedge && (bitcnt==3'b111);
 
 	always @(posedge clk or posedge reset) begin
 		if (reset) 	rx <= 8'd0;
@@ -140,8 +140,8 @@ module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, read_tx, byte_received, res
 		else begin	
 			if (!SSEL_active) byte_data_sent <= 8'd0; 
 			else begin
-				if (byte_start) byte_data_sent <= tx;
-				if (SCK_fallingedge) byte_data_sent <= {byte_data_sent[6:0], 1'b0};
+				if (SCK_risingedge && bitcnt==3'b000) byte_data_sent <= tx;
+				else if (SCK_risingedge) byte_data_sent <= {byte_data_sent[6:0], 1'b0};
 				end
 			
 			end
