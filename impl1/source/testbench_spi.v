@@ -38,7 +38,10 @@ module testbench_spi();
 		clk_12mhz <= 1'b0;
 		reset <= 1'b1;
 		//trigger <= 1'b0;	
-		counter <= 1'b1;
+		counter <= 1'b1;	  
+		pos_comp <= 1'b0;
+		neg_comp <= 1'b1;
+		
 		
 		spi_clk <= 1'b0;
 		spi_cs <= 1'b1;
@@ -47,10 +50,10 @@ module testbench_spi();
 		//spi_miso <= 1'b1;
 		spi_divider <= 8'd0;
 		spi_clk_counter <= 8'd0;
-		//buffer0 <= 8'h01;	//0x01
-		//buffer1 <= 8'h11;	//0x05	  	
-		buffer0 <= 8'h00;	//0x01
-		buffer1 <= 8'h00;	//0x05	  	
+		buffer0 <= 8'h01;	//0x01
+		buffer1 <= 8'h11;	//0x05	  	
+		//buffer0 <= 8'h00;	//0x01
+		//buffer1 <= 8'h00;	//0x05	  	
 		
 		$display("Running 'spi' testbench");
 		//#350 reset <= 1'b1;  
@@ -63,7 +66,7 @@ module testbench_spi();
 		//#1240000 trigger = 1'b0;
 
 		//#400000 $stop;
-		#110000000 $stop;
+		#210000000 $stop;
 		$display("'spi' testbench stopped");
 		end
 
@@ -170,7 +173,24 @@ module testbench_spi();
 							end
 					endcase	
 			8'h04:  buffer0 <= 8'h05;
-			8'h05:  buffer0 <= 8'h05;
+			8'h05:  buffer0 <= 8'h06;
+			8'h06:  
+				case(buffer1)
+					8'h01: begin
+							buffer1 <= 8'h02;
+							end
+					8'h02: begin
+							buffer1 <= 8'h03;
+							end	   
+					8'h03: begin
+							buffer1 <= 8'h04;
+							end	   
+
+					//8'h03: begin	
+//							buffer1 <= 8'h01;
+//							buffer0 <= 8'h04;
+//							end
+					endcase	
 			endcase
 	end	
 		
@@ -259,6 +279,14 @@ module testbench_spi();
 		#4000000 counter <= ~counter;
 		end
 		
+	reg pos_comp, neg_comp;
+	always begin
+		#12000000 neg_comp <= ~neg_comp;	
+		#33000000 neg_comp <= ~neg_comp;
+		#12000000 pos_comp <= ~pos_comp;	
+		#33000000 pos_comp <= ~pos_comp;
+		
+		end	
 	
 	top top(
 		.clk_12mhz(clk_12mhz), 
@@ -292,8 +320,8 @@ module testbench_spi();
 
 
 		// AVK of capacitance
-		.pos_comparator(),
-		.neg_comparator(),
+		.pos_comparator(pos_comp),
+		.neg_comparator(neg_comp),
 		.ref_avk(),
 		.antibounce(),
 		

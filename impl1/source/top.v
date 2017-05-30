@@ -55,13 +55,11 @@ module top(
 
 	wire cnt_in;
 	wire cnt_en;
-	wire prebuf_wr_en;
 	
 	wire [23:0] count;
 	wire fifo_wr_en;
 	
-	assign fifo_wr_en = prebuf_wr_en;
-
+	
 
 
 	
@@ -77,11 +75,12 @@ module top(
 	wire fifo_full;
 	wire fifo_ae;
 	wire fifo_af;
+	wire fifo_level_reset;
 	
 	wire prebuf_rd_en;
 	wire fifo_control_rd_en;
 	
-	assign fifo_rd_en = prebuf_rd_en | fifo_control_rd_en;
+
 
 
 
@@ -177,7 +176,7 @@ module top(
 		
 		);
 
-	wire fe_count;
+	wire fe_count, re_count;
 	
 	count_choise COUNT_CHOISE(
 		.count_mode	(count_mode),
@@ -196,11 +195,10 @@ module top(
 		.en			(cnt_en),
 		.count_p	(count_p),
 		.count_m	(count_m),
-		.risingedge (prebuf_wr_en),
+		.risingedge (re_count),
 		.fallingedge(fe_count),
 		.reset		(rst_sync)
 		) /* synthesis syn_noprune = 1 */;
-
 
 
 	
@@ -211,11 +209,13 @@ module top(
 		.count_p(count_p),
 		.count(count),
 		.falling_edge(fe_count),
-		.wr_en(),
-		.rd_en(prebuf_rd_en),
-		.spi_cmd(spi_cmd),
-		.fifo_full(fifo_full),
-		.fifo_level(fifo_level),
+		.rising_edge(re_count),
+		//.wr_en(),
+		//.rd_en(prebuf_rd_en),
+		//.spi_cmd(spi_cmd),
+		//.fifo_full(fifo_full),
+		//.fifo_level(fifo_level),
+		.fifo_wr_en(fifo_wr_en),
 		.reset(rst_sync)
 		)/* synthesis syn_noprune = 1 */;
 	
@@ -226,7 +226,7 @@ module top(
 		.WrEn(fifo_wr_en), 
 		.RdEn(fifo_rd_en), 
 		.Reset(rst_sync), 
-		.RPReset(rst_sync), 
+		.RPReset(fifo_level_reset), 
 		.Q(fifo_out), 
 		.Empty(fifo_empty), 
 		.Full(fifo_full), 
@@ -237,10 +237,13 @@ module top(
 	fifo_control FIFO_CONTROL(
 		.clk_12mhz(clk_12mhz),
 		.fifo_out(fifo_out),
-		.fifo_control_rd_en(fifo_control_rd_en),
+		//.fifo_control_rd_en(fifo_control_rd_en),
 		.fifo_rd_en(fifo_rd_en),
 		.fifo_wr_en(fifo_wr_en),
 		.fifo_level(fifo_level),
+		.fifo_empty(fifo_empty),
+		.fifo_full(fifo_full),
+		.fifo_level_reset(fifo_level_reset),
 		
 		.spi_bit_3      (spi_bit_3    ),
 		.spi_bit_0      (spi_bit_0    ),		
@@ -336,6 +339,7 @@ module top(
 		.read_meas_data(read_meas_data),
 		.meas_data(meas_data),
 		.fifo_level(fifo_level),
+		.fifo_level_reset(fifo_level_reset),
 		.spi_cmd(spi_cmd)
 		//);
 		)/* synthesis syn_noprune = 1 */;
@@ -370,11 +374,13 @@ endmodule
 module fifo_control(
 		input wire clk_12mhz,
 		input wire [23:0] fifo_out,
-		output wire fifo_control_rd_en,
-		input wire fifo_rd_en,
+		//output wire fifo_control_rd_en,
+		output wire fifo_rd_en,
 		input wire fifo_wr_en,
 		output reg [3:0] fifo_level,
-
+		input wire fifo_empty,
+		input wire fifo_full,
+		input wire fifo_level_reset,
 		input wire spi_bit_3,
 		input wire spi_bit_0,
 
@@ -417,6 +423,26 @@ module fifo_control(
 	assign fifo_buffer_out_w2 = (fifo_rd_en_buf1) ? fifo_out[23:16] : fifo_buffer_out[2];
 	assign fifo_buffer_out_w1 = (fifo_rd_en_buf1) ? fifo_out[15:8] : fifo_buffer_out[1];
 	assign fifo_buffer_out_w0 = (fifo_rd_en_buf1) ? fifo_out[7:0] : fifo_buffer_out[0];
+	
+			
+			reg prebuf_rd_en;
+			assign fifo_rd_en = prebuf_rd_en | fifo_control_rd_en;
+		
+		
+			initial begin
+				prebuf_rd_en <= 1'b0;
+				end
+		
+			always @(posedge clk_12mhz or posedge rst_sync) begin
+				if (rst_sync) prebuf_rd_en <= 1'b0;
+				else begin
+					/*	Если буфер FIFO наполняется до предела, необходимо прочесть один байт,
+						чтобы при обращении мастера в буфере были актуальные данные
+					*/
+					if (fifo_full && !prebuf_rd_en && fifo_level == 4'd8) prebuf_rd_en <= 1'b1;
+					else prebuf_rd_en <= 1'b0;
+					end
+				end
 	
 	
 	 // Bufferring spi_csn with postive edge                    
@@ -475,7 +501,8 @@ module fifo_control(
 		else begin
 			if (fifo_wr_en && fifo_level < 4'd15) fifo_level <= fifo_level + 4'd1;
 			if (fifo_rd_en && fifo_level > 4'd0) fifo_level <= fifo_level - 4'd1;
-			
+			if (fifo_level_reset || fifo_empty) fifo_level <= 4'd0;
+				
 			//if (read_meas_data && !fifo_buffer_out_count) begin
 				////fifo_rd_en <= 1'b1;
 				//reading_fifo <= 1'b1;

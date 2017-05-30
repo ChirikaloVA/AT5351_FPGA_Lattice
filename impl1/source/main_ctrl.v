@@ -33,6 +33,7 @@ module main_ctrl (
 	read_meas_data,
 	meas_data,
 	fifo_level,
+	fifo_level_reset,
 	spi_cmd           // The slim buffer version of the SPI command used for the performance 
     
     );
@@ -73,6 +74,7 @@ module main_ctrl (
 	output reg	read_meas_data;
 	input wire [7:0] meas_data;
 	input wire [3:0] fifo_level;
+	output reg fifo_level_reset;
 	output reg  [3:0] spi_cmd /* synthesis syn_keep*/;          // The slim buffer version of the SPI command used for the performance 
     	
     // The definitions for SPI EFB register address
@@ -261,6 +263,7 @@ module main_ctrl (
 		  read_meas_data <= 1'b0;
           wr_data_read <= 1'b0;
 		  
+		  fifo_level_reset <= 1'b0;
           case (main_sm)
           // IDLE state
           `S_IDLE:     if (spi_cmd_start) begin
@@ -563,7 +566,27 @@ module main_ctrl (
 										read_meas_data <= 1'b1;
 										//wr_data <= 8'h55;
 										end
-						  
+						  `SETTINGS: begin
+										main_sm <= `S_DATA_WR;     // Go to `S_IDLE state when the SPI command is Write GPO
+										wr_data_read <= 1'b1;
+										
+										case(rd_data[7:0])
+											  8'h1: begin 			//—чет в режиме измерени€
+													count_mode <= 1'b0; 
+													wr_data <= 8'hAA;
+													end 
+											  8'h2:	begin			//—чет в режиме ј¬  Ємкостей
+													count_mode <= 1'b1; 
+													wr_data <= 8'hAA;
+													end
+											  8'h3:	begin			//—брос счетчика FIFO
+													//count_mode <= 1'b1; 
+													fifo_level_reset <= 1'b1;
+													wr_data <= 8'hAA;
+													end	
+											  default: wr_data <= 8'hFF;
+											  endcase										
+										end
                           default:     begin 
 										main_sm <= `S_IDLE;        // Go to `S_IDLE state when the SPI command is illegal
 										wr_data <= 8'hFF;

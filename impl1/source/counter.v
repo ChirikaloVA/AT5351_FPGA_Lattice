@@ -182,38 +182,43 @@ module count_prebufer(
 		input wire [22:0] count_p,
 		output reg [23:0] count,
 		input wire falling_edge,
-		output reg wr_en,
-		output reg rd_en,
-		input wire [3:0] spi_cmd,
-		input wire fifo_full,
-		input wire [3:0] fifo_level,
+		input wire rising_edge,
+		//output reg wr_en,
+		//output reg rd_en,
+		//input wire [3:0] spi_cmd,
+		//input wire fifo_full,
+		//input wire [3:0] fifo_level,
+		output reg fifo_wr_en,
 		input wire reset
 		);
 	
 	initial begin
-		wr_en <= 1'b1;
-		rd_en <= 1'b0;
 		count <= 24'b0;
+		fifo_wr_en <= 1'b0;
 		end
 		
 		
 		
 	always @(posedge clk_12mhz or posedge reset) begin
 		if (reset) begin
-			wr_en <= 1'b1;
-			rd_en <= 1'b0;
 			count <= 24'b0;
+			fifo_wr_en <= 1'b0;
 			end
 		else begin
-			if (!mode) count <= count_p - count_m;
+			if (!mode) begin 
+				count <= count_p - count_m;
+				fifo_wr_en <= rising_edge;
+				end
+			else begin 
+				if (falling_edge) count <= count_p;
+				else if (rising_edge) count <= count_m;
+				
+				fifo_wr_en <= rising_edge | falling_edge;
+				end
 			//if (!mode) count <= {1'b0, count_p};
 
 
-			/*	Если буфер FIFO наполняется до предела, необходимо прочесть один байт,
-				чтобы при обращении мастера в буфере были актуальные данные
-			*/
-			if (fifo_full && !rd_en && fifo_level == 4'd8) rd_en <= 1'b1;
-			else rd_en <= 1'b0;
+
 			end
 		end
 		
