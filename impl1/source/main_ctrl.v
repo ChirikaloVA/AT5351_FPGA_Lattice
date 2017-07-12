@@ -30,6 +30,7 @@ module main_ctrl (
 	cs_out,    // GPIO port output data bus
 	
 	count_mode,
+	ref_avk_1,
 	read_meas_data,
 	meas_data,
 	fifo_level,
@@ -63,7 +64,7 @@ module main_ctrl (
     output reg	[3:0] input_sel;
 	output reg	[2:0] mu_sel;
 	output reg	[3:0] avk_sel;
-	output reg		ref_sel;
+	output wire		ref_sel;
 	output reg		fil1_sel;
 	output reg		fil2_sel;
 	output wire 	relay_reset;
@@ -71,6 +72,8 @@ module main_ctrl (
 	output wire  [2:0]	cs_out;    // GPIO port output data bus
 	
 	output reg	count_mode;
+	reg 		ref_avk_0;
+	input wire 	ref_avk_1;
 	output reg	read_meas_data;
 	input wire [7:0] meas_data;
 	input wire [3:0] fifo_level;
@@ -250,7 +253,7 @@ module main_ctrl (
           input_sel <= 4'b1111;
 		  avk_sel <= 4'b1111;
           mu_sel <= 3'b110;
-          ref_sel <= 1'b0;
+          ref_avk_0 <= 1'b0;
           fil1_sel <= 1'b0;       
           fil2_sel <= 1'b1;       
           cs_dout <= 3'b111;
@@ -513,6 +516,19 @@ module main_ctrl (
 														default: wr_data <= 8'hFF;
 														endcase
 													end
+											4'h6: begin
+													case(rd_data[3:0])
+														4'h0: begin
+																ref_avk_0 <= 1'b0;
+																wr_data <= 8'hAA;
+																end
+														4'hF: begin
+																ref_avk_0 <= 1'b1;
+																wr_data <= 8'hAA;
+																end
+														default: wr_data <= 8'hFF;
+														endcase
+													end
 											default: wr_data <= 8'hFF;
 											endcase
                                        end
@@ -526,6 +542,7 @@ module main_ctrl (
 										  8'd3: wr_data <= {4'd0,avk_sel};
 										  8'd4: wr_data <= {7'd0,fil1_sel};
 										  8'd5: wr_data <= {7'd0,fil2_sel};
+										  8'd6: wr_data <= {7'd0,ref_sel};
 										  default: wr_data <= 8'hFF;
 										  endcase
                                        end 
@@ -671,7 +688,29 @@ module main_ctrl (
           endcase              
        end
     
+	
+	
+	ref_choise REF_CHOISE(
+		.ref_mode_1(ref_avk_0),
+		.ref_mode_2(ref_avk_1),
+		.mode(count_mode),
+		.ref_avk(ref_sel)
+		);	
+	
+	
 endmodule     
     
     
+	
+module ref_choise(
+	input wire ref_mode_1,
+	input wire ref_mode_2,
+	input wire mode,
+	output wire ref_avk
+	);
+	
+	assign ref_avk = mode ? ref_mode_2 : ref_mode_1;
+	
+endmodule	
+	
     

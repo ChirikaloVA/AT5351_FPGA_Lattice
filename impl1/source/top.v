@@ -157,6 +157,9 @@ module top(
 		if (rst_sync) relay_reset <= 1'b1;
 
 
+	wire ref_avk_0;
+	wire ref_avk_1;	
+
 	ADC_trigger ADC_trigger(
 		.clk	(clk_4mhz), 
 		.d		(adc_comp), 
@@ -168,7 +171,7 @@ module top(
 	avk_capacitance AVK_CAPACITANCE(
 		.pos_comparator(pos_comparator),
 		.neg_comparator(neg_comparator),
-		.reference	(ref_avk),
+		.reference	(ref_avk_1),
 		.antibounce	(antibounce),
 		.clock_4mhz	(clk_4mhz), //4MHz	
 		.clock_12mhz(clk_12mhz), //12MHz	
@@ -176,13 +179,17 @@ module top(
 		
 		);
 
+
+
+
+
 	wire fe_count, re_count;
 	
 	count_choise COUNT_CHOISE(
 		.count_mode	(count_mode),
 		.count1		(adc_count),
 		.enable1	(1'b1),
-		.count2		(ref_avk),
+		.count2		(ref_avk_1),
 		.enable2	(antibounce),
 		.count		(cnt_in),
 		.enable		(cnt_en)
@@ -329,13 +336,14 @@ module top(
 		.mu_sel		(mu_sel),
 		.avk_sel	(avk_sel),
 		//.ref_sel	(ref_sel),
-		.ref_sel	(),
+		.ref_sel	(ref_avk),
 		.fil1_sel	(fil1_sel),
 		.fil2_sel	(fil2_sel),
 		.relay_reset(),
 		.cs_out	({relay_cs, comp2_cs, comp1_cs}),
 		
 		.count_mode(count_mode),
+		.ref_avk_1(ref_avk_1),
 		.read_meas_data(read_meas_data),
 		.meas_data(meas_data),
 		.fifo_level(fifo_level),
