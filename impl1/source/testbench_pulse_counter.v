@@ -80,14 +80,14 @@ module testbench_pulse_counter();
 		#166740 reset <= 1'b0;
 		//#400000 trigger = 1'b1;
 		//#1240000 trigger = 1'b0;
-		#2000000000	 cnt_choise <= 1'b0;
-		#2000000000	 cnt_choise <= 1'b1;
-		#2000000000	 cnt_choise <= 1'b1;
-		#2000000000	 cnt_choise <= 1'b1;
-		#2000000000	 cnt_choise <= 1'b1;
-		#2000000000	 cnt_choise <= 1'b1;
-		#2000000000	 cnt_choise <= 1'b1;
-		#2000000000	 cnt_choise <= 1'b1;
+		#200000000	 cnt_choise <= 1'b0;
+		#200000000	 cnt_choise <= 1'b1;
+		#200000000	 cnt_choise <= 1'b1;
+		#200000000	 cnt_choise <= 1'b1;
+		#200000000	 cnt_choise <= 1'b1;
+		#200000000	 cnt_choise <= 1'b1;
+		#200000000	 cnt_choise <= 1'b1;
+		#200000000	 cnt_choise <= 1'b1;
 		#8000 $stop;
 		$display("'pulse_counter' testbench stopped");
 		end
@@ -99,7 +99,7 @@ module testbench_pulse_counter();
 		
 
 	clock_4mhz CLK_4MHZ(
-		.clk_in(clk_12mhz),
+		.clk_12mhz(clk_12mhz),
 		.clk_4mhz(clk_4mhz),
 		.reset(reset)
 		);
@@ -107,9 +107,9 @@ module testbench_pulse_counter();
 
 
 	always begin
-		#2000000000 antibounce <= ~antibounce;
-		#5000000	ref_avk <= ~ref_avk;
-		#5000000	antibounce <= ~antibounce;
+		#200000000 antibounce <= ~antibounce;
+		#500000	ref_avk <= ~ref_avk;
+		#500000	antibounce <= ~antibounce;
 		end
 	
 	
@@ -122,7 +122,7 @@ module testbench_pulse_counter();
 	
 
 	count_choise COUNT_CHOISE(
-		.cnt_choise(cnt_choise),
+		.count_mode(cnt_choise),
 		.count1(counter),
 		.enable1(1'b1),
 		.count2(ref_avk),
@@ -139,8 +139,22 @@ module testbench_pulse_counter();
 		//.cnt_choise(cnt_choise),
 		.count_p(count_p),
 		.count_m(count_m),
-		
+		.risingedge(),
+		.fallingedge(),		
 		.reset(reset)
-		);
+		);	  
+		
+	count_prebufer COUNT_PREBUFFER(
+		.clk_12mhz(clk_12mhz),
+		.mode(cnt_choise),
+		.count_m(count_m),
+		.count_p(count_p),
+		.count(),
+		.falling_edge(),
+		.rising_edge(),
+
+		.fifo_wr_en(),
+		.reset(reset)		
+	);	
 
 endmodule

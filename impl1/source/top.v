@@ -48,8 +48,8 @@ module top(
 	assign reset = ~rst;
 	
 		 
-	wire [22:0] count_p;
-	wire [22:0] count_m;
+	wire [23:0] count_p;
+	wire [23:0] count_m;
 
 
 
@@ -232,7 +232,7 @@ module top(
 		.RdClock(clk_12mhz), 
 		.WrEn(fifo_wr_en), 
 		.RdEn(fifo_rd_en), 
-		.Reset(rst_sync), 
+		.Reset(rst_sync | fifo_level_reset), 
 		.RPReset(fifo_level_reset), 
 		.Q(fifo_out), 
 		.Empty(fifo_empty), 

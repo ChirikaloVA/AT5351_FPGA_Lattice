@@ -63,8 +63,8 @@ module counter(
 		input wire clk_4mhz,
 		input wire cnt,
 		input wire en,
-		output wire [22:0] count_p,
-		output wire [22:0] count_m,
+		output wire [23:0] count_p,
+		output wire [23:0] count_m,
 		output wire risingedge,
 		output wire fallingedge,
 		input wire reset
@@ -80,13 +80,13 @@ module counter(
 	assign fallingedge = cnt_fallingedge;
 	
 	//Регистры счетчика
-	reg [22:0] p /* synthesis syn_keep*/;
-	reg [22:0] m /* synthesis syn_keep*/;	
+	reg [23:0] p /* synthesis syn_keep*/;
+	reg [23:0] m /* synthesis syn_keep*/;	
 	//output reg [22:0] count_p;
 	//output reg [22:0] count_m;
 
-	reg [22:0] cnt_p /* synthesis syn_keep*/;
-	reg [22:0] cnt_m /* synthesis syn_keep*/;
+	reg [23:0] cnt_p /* synthesis syn_keep*/;
+	reg [23:0] cnt_m /* synthesis syn_keep*/;
 	assign count_p = cnt_p ;
 	assign count_m = cnt_m ;
 	
@@ -98,25 +98,25 @@ module counter(
 
 	always @(posedge clk_4mhz or posedge reset) begin
 		if (reset) begin
-			p <= 23'd0;
-			m <= 23'd0;
+			p <= 24'd0;
+			m <= 24'd0;
 			end
 		else begin
 			if (en) begin
-				if (cnt) p <= p + 23'b1;
-				else if (!cnt) m <= m + 23'b1;
+				if (cnt) p <= p + 24'b1;
+				else if (!cnt) m <= m + 24'b1;
 					
 				//Введена задержка обнуления счетчиков, для уверенного сохранения 
 				//содержимого счетчика
-				if (cnt_sync == 3'b111) m <= 23'b0 ;
-				if (cnt_sync == 3'b000) p <= 23'b0 ;
+				if (cnt_sync == 3'b111) m <= 24'b0 ;
+				if (cnt_sync == 3'b000) p <= 24'b0 ;
 				end
 			end
 		end
 
 	//Сохранение значение счетчика низкого уровня входного сигнала
 	always @(posedge clk_12mhz or posedge reset) begin
-		if (reset) cnt_m <= 23'b0;
+		if (reset) cnt_m <= 24'b0;
 		else begin 
 			if (cnt_risingedge) cnt_m <= m;
 			end
@@ -124,7 +124,7 @@ module counter(
 		
 	//Сохранение значение счетчика высокого уровня входного сигнала
 	always @(posedge clk_12mhz or posedge reset) begin
-		if (reset) cnt_p <= 23'b0;
+		if (reset) cnt_p <= 24'b0;
 		else begin
 			if (cnt_fallingedge) cnt_p <= p;
 			end
@@ -178,8 +178,8 @@ endmodule
 module count_prebufer(
 		input wire clk_12mhz,
 		input wire mode,
-		input wire [22:0] count_m,
-		input wire [22:0] count_p,
+		input wire [23:0] count_m,
+		input wire [23:0] count_p,
 		output reg [23:0] count,
 		input wire falling_edge,
 		input wire rising_edge,
@@ -206,7 +206,7 @@ module count_prebufer(
 			end
 		else begin
 			if (!mode) begin 
-				count <= count_p - count_m;
+				count <= count_p[22:0] - count_m[22:0];
 				fifo_wr_en <= rising_edge;
 				end
 			else begin 
