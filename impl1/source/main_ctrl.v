@@ -482,6 +482,10 @@ module main_ctrl (
 																avk_sel <= 4'b0111;
 																wr_data <= 8'hAA;
 																end
+														4'h5: begin
+																avk_sel <= 4'b0011;
+																wr_data <= 8'hAA;
+																end
 														4'hF: begin
 																avk_sel <= 4'b1111;
 																wr_data <= 8'hAA;
