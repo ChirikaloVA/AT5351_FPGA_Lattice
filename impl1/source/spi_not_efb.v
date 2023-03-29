@@ -5,7 +5,8 @@ module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, read_tx, byte_received, res
 	input clk; 
 	input SCK; 
 	input MOSI 			/* synthesis syn_keep = 1 */; 
-	output tri MISO; 
+	//output tri MISO;
+	output MISO;
 	input SSEL; 
 	input wire [7:0] tx;
 	output reg [7:0] rx;
@@ -147,7 +148,8 @@ module SPI_slave(clk, SCK, MOSI, MISO, SSEL, rx, tx, read_tx, byte_received, res
 			end
 		end
 
-	assign MISO = (SSEL_active) ? byte_data_sent[7] : 1'bz;   //send MSB first 
+	//assign MISO = (SSEL_active) ? byte_data_sent[7] : 1'bz;   //send MSB first 
+	assign MISO = (SSEL_active) ? byte_data_sent[7] : 1'b0;   //send MSB first
 	
 /*	always @(posedge clk)
 		if(SSEL_active)

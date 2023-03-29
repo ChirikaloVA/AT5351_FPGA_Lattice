@@ -1,4 +1,17 @@
 `timescale 1 ns / 1 ps
+module clock_6mhz(
+		input  clk_12mhz,
+		output tst_out
+		);
+	reg tst;
+	
+	assign tst_out = tst;
+	always @(posedge clk_12mhz)
+	begin
+		tst <= ~ tst;			
+	end	
+endmodule
+
 
 module top(
 		input wire clk_12mhz, 
@@ -9,7 +22,8 @@ module top(
 		output wire adc_countn, 
 		input wire spi_clk, 
 		input wire spi_mosi, 
-		output tri spi_miso, 
+		//output tri spi_miso,
+		output wire spi_miso, 
 		input wire spi_cs, 
 		input wire rst,
 		output wire comp1_cs,
@@ -36,7 +50,10 @@ module top(
 		output wire ref_avk,
 		output wire antibounce,
 		
-		output wire [7:0] rd_data_out
+		output wire [7:0] rd_data_out,
+		
+		output tst_out,
+		output tst1_out
 		
 		//input wire cnt_choise
 		) /* synthesis GSR = 1 */	;
@@ -45,7 +62,9 @@ module top(
 	wire adc_count; 
 	wire reset;
 	wire rst_sync;
-	assign reset = ~rst;
+	
+	
+	
 	
 		 
 	wire [23:0] count_p;
@@ -104,6 +123,13 @@ module top(
 	wire       wb_xfer_req;
 	
 	wire 	   spi_irq;
+	
+	wire 		tst_t;
+	wire 		tst_t1;
+	reg			tst;
+	reg			tst_out;
+	wire 		tst1_out;
+	wire		n_clk_12mhz;
     
 	//wire rd_data_out;
 	//assign wr_data_out = wr_data;
@@ -116,9 +142,28 @@ module top(
 
 
 	wire PURNET;
+	wire gsr_reset;
 	PUR PUR_INST (.PUR (PURNET));
-	defparam PUR_INST.RST_PULSE = 100;	
-	GSR GSR_INST (.GSR (reset));
+	//defparam PUR_INST.RST_PULSE = 100;	
+	GSR GSR_INST (.GSR (gsr_reset));
+	assign reset = ~rst;
+	assign gsr_reset = rst;
+	//---test point----
+	//tst_out <= tst;
+	//---test point----
+	//assign tst1_out = clk_12mhz;
+	//assign n_clk_12mhz = ~clk_12mhz;
+	
+	//clock_6mhz TST_M6MHZ(
+		//.clk_12mhz(clk_12mhz),
+		//.tst_out(tst_t1)
+		//);
+		
+	//always @(negedge n_clk_12mhz)
+	//begin
+		//tst <= ~ tst;
+		//tst_out <= tst;
+	//end	
 		
 	reset RESET_SYNC(
 		.async_reset(reset),
@@ -138,13 +183,18 @@ module top(
 	
 	//assign clk =  osc_clk & osc_clk; /* synthesis syn_keep = 1 */
 	
-		
-			
 	clock_4mhz CLK_4MHZ(
 		.clk_12mhz		(clk_12mhz),
 		.clk_4mhz		(clk_4mhz),
 		.reset			(rst_sync)
-		) /* synthesis syn_noprune = 1 */;
+		) /* synthesis syn_noprune = 1 */;	
+			
+	//clock_4mhz CLK_4MHZ(
+		//.clk_12mhz		(clk_12mhz),
+		//.clk_4mhz		(clk_4mhz),
+		//.reset			(rst_sync),
+		//.tst_sig		(tst_t)
+		//) /* synthesis syn_noprune = 1 */;
 	clock_5ms CLK_5MS(
 		.clk_4mhz		(clk_4mhz), 
 		.reset			(rst_sync), 
@@ -373,7 +423,21 @@ module reset(
 endmodule
 
 
-
+//module reset(
+		//input wire async_reset,
+		//output wire sync_reset,
+		//input wire clk
+		//);
+	
+	//reg reset_out;
+	//assign 	sync_reset = reset_out;
+	
+	//always @(posedge clk ) 
+		//begin
+		//reset_out <= async_reset;
+		//end
+		
+//endmodule
 
 
 

@@ -52,6 +52,59 @@ module clock_4mhz(
 	
 endmodule
 
+//module clock_4mhz(
+		//input wire clk_12mhz,
+		//output wire clk_4mhz,
+		//input wire reset,
+		//output wire tst_sig
+		//);
+	
+    //reg [3:0] counter = 4'b0;
+    //reg a = 1'b0;
+	//reg b = 1'b0;
+	
+	//reg tst = 1'b0;
+	
+	////initial begin
+		////counter = 4'b0;
+		////a = 1'b0;
+		////b = 1'b0;
+		////end
+	//assign  tst_sig = tst;
+	
+	//always @(posedge clk_12mhz)
+	//begin
+		//tst <= ~ tst;			
+	//end
+    
+    //always @(posedge clk_12mhz) begin
+		//if (reset) begin
+			//a <= 1'b0; 
+			//counter <= 4'd0;
+			////b <= 1'b0;
+			//end
+		//else begin
+			 
+			//counter <= (counter == 4'd2) ? 4'd0 : (counter + 4'd1);
+			//if (counter == 4'd0) a <= ~b;
+			//end
+				
+    //end
+
+    //always @(negedge clk_12mhz) begin
+        //if (reset) begin
+			//b <= 1'b0; 
+			//end
+		//else begin
+			//if (counter == 4'd2) b <= a;
+			//end
+    //end
+
+    //assign clk_4mhz = a^b;
+		
+	
+//endmodule
+
 /* Модуль деления частоты 4 МГц в частоту 20Гц*/
 /**
  * @brief Модуль деления частоты 4 МГц в частоту 20Гц (5мс)
