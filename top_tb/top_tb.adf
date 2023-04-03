@@ -1,0 +1,78 @@
+[Project]
+Current Flow=Generic
+VCS=0
+version=3
+Current Config=compile
+[Configurations]
+compile=work
+[Library]
+top_tb=.\top_tb\top_tb.lib
+work=.\work\work.lib
+[Settings]
+AccessRead=1
+AccessReadWrite=0
+AccessACCB=0
+AccessACCR=0
+AccessReadWriteSLP=0
+AccessReadTopLevel=0
+DisableC=1
+ENABLE_ADV_DATAFLOW=0
+FLOW_TYPE=HDL
+LANGUAGE=VHDL
+REFRESH_FLOW=1
+[LocalVerilogSets]
+EnableSLP=1
+EnableDebug=0
+PriorityLibNames=pmi_work
+LibNames=ovi_machxo2
+[LocalVhdlSets]
+CompileWithDebug=0
+[$LibMap$]
+top_tb=.
+work=.
+[LocalVerilogDirs]
+Count=0
+[DefineMacro]
+Global=
+[Files]
+/..\..\impl1\source\top.v=-1
+/..\..\impl1\source\highvoltage.v=-1
+/..\..\impl1\source\wb_ctrl.v=-1
+/..\..\impl1\source\RAM.v=-1
+/..\..\impl1\source\main_ctrl.v=-1
+/..\..\impl1\source\spi_not_efb.v=-1
+/..\..\impl1\source\FIFO.v=-1
+/..\..\impl1\source\counter.v=-1
+/..\..\impl1\source\capacitance_avk.v=-1
+/..\..\impl1\source\dividers1.v=-1
+/..\..\impl1\source\testbench.v=-1
+/..\..\impl1\source\testbench_clock_5ms.v=-1
+/..\..\impl1\source\testbench_clock_4mhz.v=-1
+/..\..\impl1\source\testbench_pulse_counter.v=-1
+/..\..\impl1\source\testbench_antibounce.v=-1
+/..\..\impl1\source\testbench_spi.v=-1
+/..\..\impl1\source\tb_fifo.v=-1
+[Files.Data]
+.\..\impl1\source\top.v=Verilog Source Code
+.\..\impl1\source\highvoltage.v=Verilog Source Code
+.\..\impl1\source\wb_ctrl.v=Verilog Source Code
+.\..\impl1\source\RAM.v=Verilog Source Code
+.\..\impl1\source\main_ctrl.v=Verilog Source Code
+.\..\impl1\source\spi_not_efb.v=Verilog Source Code
+.\..\impl1\source\FIFO.v=Verilog Source Code
+.\..\impl1\source\counter.v=Verilog Source Code
+.\..\impl1\source\capacitance_avk.v=Verilog Source Code
+.\..\impl1\source\dividers1.v=Verilog Source Code
+.\..\impl1\source\testbench.v=Verilog Source Code
+.\..\impl1\source\testbench_clock_5ms.v=Verilog Source Code
+.\..\impl1\source\testbench_clock_4mhz.v=Verilog Source Code
+.\..\impl1\source\testbench_pulse_counter.v=Verilog Source Code
+.\..\impl1\source\testbench_antibounce.v=Verilog Source Code
+.\..\impl1\source\testbench_spi.v=Verilog Source Code
+.\..\impl1\source\tb_fifo.v=Verilog Source Code
+[SpecTracer]
+WindowVisible=0
+[HierarchyViewer]
+HierarchyInformation=
+ShowHide=ShowTopLevel
+Selected=

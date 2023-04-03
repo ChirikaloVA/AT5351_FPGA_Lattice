@@ -1,0 +1,22 @@
+MESSAGE "Pass 1. Scanning modules hierarchy."
+BEGINPROGRESS Compiling...
+UPDATEPROGRESS 35
+MESSAGE "Pass 2. Processing instantiations."
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol q has not been declared in module testbench." "D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/TB_top_AT5351/ALDEC_TB_AT5351_top/src/testbench.v" 76  19
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol n_q has not been declared in module testbench." "D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/TB_top_AT5351/ALDEC_TB_AT5351_top/src/testbench.v" 77  23
+UPDATEPROGRESS 45
+MESSAGE "Pass 3. Processing behavioral statements."
+UPDATEPROGRESS 80
+MESSAGE "Running Optimizer."
+MESSAGE "ELB/DAG code generating."
+UPDATEPROGRESS 83
+UPDATEPROGRESS 86
+UPDATEPROGRESS 90
+UPDATEPROGRESS 93
+MESSAGE "Unit top modules: testbench."
+MESSAGE "$root top modules: testbench."
+UPDATEPROGRESS 100
+ENDPROGRESS Compiling...
+SUCCESS "Compile success 0 Errors 0 Warnings  Analysis time: 0[s]."
+WARNING ALOG: "The source is compiled without the -dbg switch. Line breakpoints and assertion debug will not be available."
+MESSAGE "done"

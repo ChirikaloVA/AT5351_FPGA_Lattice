@@ -1,0 +1,261 @@
+timestamp=1680185380979
+
+[~A]
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/FIFO.v=0*25969*27676
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/RAM.v=0*11015*16689
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/capacitance_avk.v=0*32969*34607
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/counter.v=0*29586*30992
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/dividers1.v=0*35995*36970
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/highvoltage.v=0*6816*7425
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/main_ctrl.v=0*18270*22030
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/spi_not_efb.v=0*23228*24718
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/tb_fifo.v=0*52698*53816
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench.v=0*38165*39381
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_antibounce.v=0*46895*47945
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_clock_4mhz.v=0*42481*43179
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_clock_5ms.v=0*40552*41265
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_pulse_counter.v=0*44476*45626
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_spi.v=0*49227*51471
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/top.v=0*1598*5720
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/wb_ctrl.v=0*8634*9703
+LastVerilogToplevel=tb_fifo
+ModifyID=17
+Version=74
+
+[$root]
+A/$root=22|||1*153212
+BinI32/$root=3*67933
+SLP=3*68037
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|c73a565f2ade592f8ac1c68f484c921697601af06ecefb08c8ad46a4e4379666
+
+[ADC_trigger]
+A/ADC_trigger=22|./../../impl1/source/counter.v|26|1*116082
+BinI32/ADC_trigger=3*32787
+R=./../../impl1/source/counter.v|26
+SLP=3*33387
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|828fdb638ca41ccf220589f569d519a8f7c105c2727c499e8a767512b279dbe59bbdd0b57191286533ec2176f8982be1
+
+[FIFO]
+A/FIFO=22|./../../impl1/source/FIFO.v|8|1*109143
+BinI32/FIFO=3*31620
+R=./../../impl1/source/FIFO.v|8
+SLP=3*31957
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|a11a689b2db53c4db6c2c02897e28aaa8a055a008d668d098945ecbca8d9c23d
+
+[RAM]
+A/RAM=22|./../../impl1/source/RAM.v|8|1*24075
+BinI32/RAM=3*11930
+R=./../../impl1/source/RAM.v|8
+SLP=3*12032
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|1344bbc8931e060ac81abb395d7430259fd4091d82cfdb17cb8a5e6d44a0af9f
+
+[SPI_slave]
+A/SPI_slave=22|./../../impl1/source/spi_not_efb.v|3|1*103997
+BinI32/SPI_slave=3*27104
+R=./../../impl1/source/spi_not_efb.v|3
+SLP=3*29860
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|7775ab1b3c0ac0e555f3e3553566192a38fbb30d2f890fac5028972fc702166ab8debea833c38a23d62a7e1c215e03d9
+
+[avk_antibounce]
+A/avk_antibounce=22|./../../impl1/source/capacitance_avk.v|57|1*127445
+BinI32/avk_antibounce=3*39693
+R=./../../impl1/source/capacitance_avk.v|57
+SLP=3*40881
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|bf6cbb6b483d822999024e268a28a4bbec9230391402b86c22383084e4834974b8b6bab06b1dc9bf79aad9b8fd57b543
+
+[avk_capacitance]
+A/avk_capacitance=22|./../../impl1/source/capacitance_avk.v|3|1*123832
+BinI32/avk_capacitance=3*38396
+R=./../../impl1/source/capacitance_avk.v|3
+SLP=3*38510
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|dad897421284c7fed2a3047c560b0249bd0474cee5ee92a698345aa255cf07b6dad8118bf19061c51ebc702d58594c5b
+
+[clock_4mhz]
+A/clock_4mhz=22|./../../impl1/source/dividers1.v|11|1*132401
+BinI32/clock_4mhz=3*43241
+R=./../../impl1/source/dividers1.v|11
+SLP=3*44327
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|c1152bfb32194a2ab7c87c2a0294c16d99fb457ac85f42cb99598cb5cb2fb1cf98e9ada489025f4fff3e415eb2a2dabd
+
+[clock_5ms]
+A/clock_5ms=22|./../../impl1/source/dividers1.v|120|1*133940
+BinI32/clock_5ms=3*44884
+R=./../../impl1/source/dividers1.v|120
+SLP=3*45669
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|586a61c25d158068e976f579e73957c4ccb06293bff00f9b1b6ee0e026c0dd394532e90c91a93e603eabce9299aa1ba2
+
+[clock_6mhz]
+A/clock_6mhz=22|./../../impl1/source/top.v|2|1*390
+BinI32/clock_6mhz=3*172
+R=./../../impl1/source/top.v|2
+SLP=3*588
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|cc9d289b70066e18ca9d926280d7bc3c2f910ac669b330a553f863831de072a4150d3a6fbfa5eb5999f16966282174b2
+
+[comp_buffer]
+A/comp_buffer=22|./../../impl1/source/capacitance_avk.v|155|1*125697
+BinI32/comp_buffer=3*38636
+R=./../../impl1/source/capacitance_avk.v|155
+SLP=3*39330
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|d2b9e8504f13a0f7838eb5968cf71b4f65e28d207c0e59d3bb0e8dd96ec93a940594057ebbad95faab0db468054ed3c9
+
+[count_choise]
+A/count_choise=22|./../../impl1/source/counter.v|149|1*120401
+BinI32/count_choise=3*36069
+R=./../../impl1/source/counter.v|149
+SLP=3*36656
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|66f36cdc0cf948e425ddff412ba5613a086c050eedbd7900ab8e1fc864f25824da8c84cb9ceb42ac618ba79b818b7440
+
+[count_prebufer]
+A/count_prebufer=22|./../../impl1/source/counter.v|178|1*121694
+BinI32/count_prebufer=3*36835
+R=./../../impl1/source/counter.v|178
+SLP=3*37736
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|a7f589fc40793662fc4162e9603d403417c4ecd1b1564912a643bfe83dd39284b5de772995fccc1a033be7160a593bd6
+
+[counter]
+A/counter=22|./../../impl1/source/counter.v|61|1*117441
+BinI32/counter=3*33649
+R=./../../impl1/source/counter.v|61
+SLP=3*35193
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|ec8a9ceecd40c97da6d5687ce01e262f26527262ddaa47cb266f3a3c4d9b973a4929369dfd75eac0d926cc499af895dd
+
+[fifo_control]
+A/fifo_control=22|./../../impl1/source/top.v|446|1*14145
+BinI32/fifo_control=3*2879
+R=./../../impl1/source/top.v|446
+SLP=3*6202
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|7c2f9cb014e85dcc1a4e2118388543355acddfd37760d06b72f4165f17d32db0e7f61f6ef5464f6d9e0d89834585e37b
+
+[highvoltage]
+A/highvoltage=22|./../../impl1/source/highvoltage.v|3|1*19525
+BinI32/highvoltage=3*8167
+R=./../../impl1/source/highvoltage.v|3
+SLP=3*8686
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|55c2e3cf5639dd20e53ba9316c8c50071c23319459f3b4819e6d1d949fee65bcfe5c716685f07cd9e1f9aaf50669d001
+
+[main_ctrl]
+A/main_ctrl=22|./../../impl1/source/main_ctrl.v|3|1*96478
+BinI32/main_ctrl=3*13976
+R=./../../impl1/source/main_ctrl.v|3
+SLP=3*21147
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|82825c9ad646a7f0e6d5458cb060d5875fb4070a7fdfd8da59b6a7357a41e9dc05636f47777eb4a5f4f66e1fe1b02b6b
+
+[ref_choise]
+A/ref_choise=22|./../../impl1/source/main_ctrl.v|709|1*102592
+BinI32/ref_choise=3*26354
+R=./../../impl1/source/main_ctrl.v|709
+SLP=3*26787
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|4d840e1a04aa7689b7d287d09684d15ec594fc7425de662571a6c48f54568973dc9e1677f3519484ec590bc298df0512
+
+[reset]
+A/reset=22|./../../impl1/source/top.v|409|1*12955
+BinI32/reset=3*2060
+R=./../../impl1/source/top.v|409
+SLP=3*2628
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|d2c814bd6817415cf11838991ee69dfce1604d2a1d21fada00426b4b38317009
+
+[switch_reference]
+A/switch_reference=22|./../../impl1/source/capacitance_avk.v|107|1*130039
+BinI32/switch_reference=3*41429
+R=./../../impl1/source/capacitance_avk.v|107
+SLP=3*42500
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|d2109407408e8d9d3ade1c24bb2f9a81d8a206f5dd7f92ed4808414febcf88351f04dbd3296b53653000beca8f0287f6
+
+[tb_fifo]
+A/tb_fifo=22|./../../impl1/source/tb_fifo.v|3|1*153698
+BinI32/tb_fifo=3*68105
+R=./../../impl1/source/tb_fifo.v|3
+SLP=3*69405
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|4c05ec4d0f1b663f30722a8621787e3326527262ddaa47cb266f3a3c4d9b973a05d5be71e4fdc3949e5fe108628de9d2
+
+[testbench]
+A/testbench=22|./../../impl1/source/testbench.v|3|1*135740
+BinI32/testbench=3*46250
+R=./../../impl1/source/testbench.v|3
+SLP=3*48699
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|9c08cd30fe0f9550ac0d051aa32c9ba5030c5f4de3ffa3c97f58c5528f1d7913b2dfb996245cdea0e2d8a592646133f2
+
+[testbench_antibounce]
+A/testbench_antibounce=22|./../../impl1/source/testbench_antibounce.v|3|1*146570
+BinI32/testbench_antibounce=3*54737
+R=./../../impl1/source/testbench_antibounce.v|3
+SLP=3*57855
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|f964be2e77ad8b51d82abce578c37e751d456d06777494f9bd69b70c26680fcf205eb7c4e37bf7ac96f5c706eb447b33
+
+[testbench_clock_4mhz]
+A/testbench_clock_4mhz=22|./../../impl1/source/testbench_clock_4mhz.v|3|1*141580
+BinI32/testbench_clock_4mhz=3*51108
+R=./../../impl1/source/testbench_clock_4mhz.v|3
+SLP=3*51815
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|5fd7d6a32aee9d0debe18487d383ed3611105bb7ad175966e7afba1ca0a99388cbe7a2e71411a0856b9c18713a023b3c
+
+[testbench_clock_5ms]
+A/testbench_clock_5ms=22|./../../impl1/source/testbench_clock_5ms.v|3|1*139856
+BinI32/testbench_clock_5ms=3*49813
+R=./../../impl1/source/testbench_clock_5ms.v|3
+SLP=3*50517
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|5fd7d6a32aee9d0debe18487d383ed3651c0233daa8e3ac9ac98557d711b970055db06352f0e866bb21ec8f4a87a6869
+
+[testbench_pulse_counter]
+A/testbench_pulse_counter=22|./../../impl1/source/testbench_pulse_counter.v|51|1*143255
+BinI32/testbench_pulse_counter=3*52420
+R=./../../impl1/source/testbench_pulse_counter.v|51
+SLP=3*53770
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|972aac1161e5ffeb9968b3d4235fda90cd1b71085d1683a78d6efcf93a452a2626527262ddaa47cb266f3a3c4d9b973ac85b52835161418c6b68be467828a373
+
+[testbench_spi]
+A/testbench_spi=22|./../../impl1/source/testbench_spi.v|3|1*148714
+BinI32/testbench_spi=3*59915
+R=./../../impl1/source/testbench_spi.v|3
+SLP=3*64689
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|029bf574b1fcd98744740dd13e7eef821f62e6e5b47d51f09006381f14d10cef66b1e78a60a80cb362691111d17be36d
+
+[top]
+A/top=22|./../../impl1/source/top.v|16|1*1437
+BinI32/top=3*781
+R=./../../impl1/source/top.v|16
+SLP=3*1619
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|f1fdecad8dc292011c024b8d633bc5c70d9a94cb95c924601125ef844d7ae7c0
+
+[wb_ctrl]
+A/wb_ctrl=22|./../../impl1/source/wb_ctrl.v|54|1*21127
+BinI32/wb_ctrl=3*9165
+R=./../../impl1/source/wb_ctrl.v|54
+SLP=3*10843
+Version=10.3.3558.6081  (Windows)|00000004789cd34d494a0700030f015b|de641490c028d1231e26cfdbae42191e26527262ddaa47cb266f3a3c4d9b973a5d9dba068528d065576a02106d1cfa8c
+
+[~MFT]
+0=4|0work.mgf|53816|0
+1=3|1work.mgf|153698|6896
+3=6|3work.mgf|69405|2752
+
+[~U]
+$root=12|0*52075|
+ADC_trigger=12|0*28613|
+FIFO=12|0*25662|
+RAM=12|0*10627||0x10
+SPI_slave=12|0*22956|
+avk_antibounce=12|0*32485|
+avk_capacitance=12|0*31948|
+clock_4mhz=12|0*35587|
+clock_5ms=12|0*35783|
+clock_6mhz=12|0*278||0x10
+comp_buffer=12|0*32269|
+count_choise=12|0*29081|
+count_prebufer=12|0*29305|
+counter=12|0*28821|
+fifo_control=12|0*1250|
+highvoltage=12|0*6592||0x10
+main_ctrl=12|0*17609|
+ref_choise=12|0*18067|
+reset=12|0*1067|
+switch_reference=12|0*32720|
+tb_fifo=12|0*52529||0x10
+testbench=12|0*37944||0x10
+testbench_antibounce=12|0*46694||0x10
+testbench_clock_4mhz=12|0*42297||0x10
+testbench_clock_5ms=12|0*40371||0x10
+testbench_pulse_counter=12|0*44228||0x10
+testbench_spi=12|0*49026||0x10
+top=12|0*467||0x10
+wb_ctrl=12|0*8321||0x10

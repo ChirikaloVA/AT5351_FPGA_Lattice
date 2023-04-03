@@ -1,0 +1,23 @@
+<BaliSimProject version="1.3" path="." stage="0" language="-1" name="top_tb" simType="Active-HDL">
+    <Source worklib="work" path="impl1/source/top.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/highvoltage.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/wb_ctrl.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/RAM.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/main_ctrl.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/spi_not_efb.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/FIFO.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/counter.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/capacitance_avk.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/dividers1.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/testbench.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/testbench_clock_5ms.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/testbench_clock_4mhz.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/testbench_pulse_counter.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/testbench_antibounce.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/testbench_spi.v" type="VERILOG" include="none"/>
+    <Source worklib="work" path="impl1/source/tb_fifo.v" type="VERILOG" include="none"/>
+    <SimLib value="pmi_work ovi_machxo2"/>
+    <GlbInc value=""/>
+    <Macro value=""/>
+    <TopModule instance="" language="VERILOG" name="testbench"/>
+</BaliSimProject>

@@ -1,0 +1,5 @@
+1
+~M 0 "" 0 $root
+~A 1 "" 0 $root
+~M 3 "./../src/testbench.v" 3 testbench
+~A 1 "./../src/testbench.v" 3 testbench

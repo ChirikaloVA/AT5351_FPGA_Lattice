@@ -1,0 +1,28 @@
+MESSAGE "Pass 1. Scanning modules hierarchy."
+MESSAGE_SP VCP2113 "Module \$root found in current working library."
+BEGINPROGRESS Compiling...
+UPDATEPROGRESS 35
+MESSAGE_SP VCP2113 "Module FIFO found in current working library."
+MESSAGE "Pass 2. Processing instantiations."
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol PURNET has not been declared in module tb_fifo." "D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/tb_fifo.v" 23  31
+UPDATEPROGRESS 45
+MESSAGE "Pass 3. Processing behavioral statements."
+UPDATEPROGRESS 80
+MESSAGE "ELB/DAG code generating."
+MESSAGE_SP VCP2113 "Module \$root found in current working library."
+UPDATEPROGRESS 81
+UPDATEPROGRESS 83
+UPDATEPROGRESS 85
+UPDATEPROGRESS 87
+UPDATEPROGRESS 89
+UPDATEPROGRESS 90
+UPDATEPROGRESS 92
+UPDATEPROGRESS 94
+UPDATEPROGRESS 96
+UPDATEPROGRESS 98
+UPDATEPROGRESS 100
+MESSAGE "Unit top modules: tb_fifo."
+MESSAGE "$root top modules: clock_6mhz highvoltage wb_ctrl RAM testbench testbench_clock_5ms testbench_clock_4mhz testbench_pulse_counter testbench_antibounce testbench_spi tb_fifo."
+ENDPROGRESS Compiling...
+SUCCESS "Compile success 0 Errors 0 Warnings  Analysis time: 0[s]."
+MESSAGE "done"

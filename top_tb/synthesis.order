@@ -1,0 +1,17 @@
+i<>.\..\impl1\source\top.v
+i<>.\..\impl1\source\highvoltage.v
+i<>.\..\impl1\source\wb_ctrl.v
+i<>.\..\impl1\source\RAM.v
+i<>.\..\impl1\source\main_ctrl.v
+i<>.\..\impl1\source\spi_not_efb.v
+i<>.\..\impl1\source\FIFO.v
+i<>.\..\impl1\source\counter.v
+i<>.\..\impl1\source\capacitance_avk.v
+i<>.\..\impl1\source\dividers1.v
+i<>.\..\impl1\source\testbench.v
+i<>.\..\impl1\source\testbench_clock_5ms.v
+i<>.\..\impl1\source\testbench_clock_4mhz.v
+i<>.\..\impl1\source\testbench_pulse_counter.v
+i<>.\..\impl1\source\testbench_antibounce.v
+i<>.\..\impl1\source\testbench_spi.v
+i<>.\..\impl1\source\tb_fifo.v

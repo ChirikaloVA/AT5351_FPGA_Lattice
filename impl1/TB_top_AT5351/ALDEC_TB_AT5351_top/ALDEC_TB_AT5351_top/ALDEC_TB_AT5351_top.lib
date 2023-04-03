@@ -1,0 +1,29 @@
+timestamp=1680185219927
+
+[~A]
+D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/TB_top_AT5351/ALDEC_TB_AT5351_top/src/testbench.v=0*387*1666
+LastVerilogToplevel=testbench
+ModifyID=1
+Version=74
+
+[$root]
+A/$root=22|||1*0
+BinI32/$root=3*0
+SLP=3*104
+Version=10.3.3558.6081  (Windows)|0000000b789cd3f53752d02d2e33ca3634020010aa02e5|c73a565f2ade592f8ac1c68f484c9216903f53952e33ba6ca8f1472a94cab2f9
+
+[testbench]
+A/testbench=22|./../src/testbench.v|3|1*374
+BinI32/testbench=3*172
+R=./../src/testbench.v|3
+SLP=3*2212
+Version=10.3.3558.6081  (Windows)|0000000b789cd3f53752d02d2e33ca3634020010aa02e5|9c08cd30fe0f9550ac0d051aa32c9ba5030c5f4de3ffa3c97f58c5528f1d7913fd8fd8aa28958f9d2ffbeb48a116e3df
+
+[~MFT]
+0=4|0ALDEC_TB_AT5351_top.mgf|1666|0
+1=2|1ALDEC_TB_AT5351_top.mgf|374|0
+3=4|3ALDEC_TB_AT5351_top.mgf|2212|0
+
+[~U]
+$root=12|0*0|
+testbench=12|0*166||0x10

@@ -1,0 +1,11 @@
+clock_6mhz,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/top.v
+highvoltage,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/highvoltage.v
+wb_ctrl,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/wb_ctrl.v
+RAM,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/RAM.v
+testbench,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench.v
+testbench_clock_5ms,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_clock_5ms.v
+testbench_clock_4mhz,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_clock_4mhz.v
+testbench_pulse_counter,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_pulse_counter.v
+testbench_antibounce,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_antibounce.v
+testbench_spi,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench_spi.v
+tb_fifo,/,D:/Users/Chirikalo/Lattice_proj/DKS-5351_fpga_for_MACHXO2_2000/impl1/source/tb_fifo.v

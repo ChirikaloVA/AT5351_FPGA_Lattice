@@ -108,6 +108,9 @@
         <Source name="timing.ldc" type="LSE Design Constraints File" type_short="LDC">
             <Options/>
         </Source>
+        <Source name="top_tb/top_tb.spf" type="Simulation Project File" type_short="SPF">
+            <Options/>
+        </Source>
     </Implementation>
     <Strategy name="Strategy1" file="DKS_5351_MACHXO2_20001.sty"/>
 </BaliProject>

@@ -1,0 +1,15 @@
+[Files List]
+C:\lscc\diamond\3.10_x64\active-hdl\vlib\std/src/standard.vhd=S
+D:\Users\Chirikalo\Lattice_proj\DKS-5351_fpga_for_MACHXO2_2000/impl1/source/main_ctrl.v=S
+C:\lscc\diamond\3.10_x64\active-hdl\vlib\ovi_machxo2/src/FIFO8KB.v=S
+C:\lscc\diamond\3.10_x64\active-hdl\vlib\ovi_machxo2/src/VLO.v=S
+C:\lscc\diamond\3.10_x64\active-hdl\vlib\ovi_machxo2/src/VHI.v=S
+D:\Users\Chirikalo\Lattice_proj\DKS-5351_fpga_for_MACHXO2_2000/impl1/source/capacitance_avk.v=S
+D:\Users\Chirikalo\Lattice_proj\DKS-5351_fpga_for_MACHXO2_2000/impl1/source/spi_not_efb.v=S
+D:\Users\Chirikalo\Lattice_proj\DKS-5351_fpga_for_MACHXO2_2000/impl1/source/top.v=S
+D:\Users\Chirikalo\Lattice_proj\DKS-5351_fpga_for_MACHXO2_2000/impl1/source/FIFO.v=S
+D:\Users\Chirikalo\Lattice_proj\DKS-5351_fpga_for_MACHXO2_2000/impl1/source/counter.v=S
+D:\Users\Chirikalo\Lattice_proj\DKS-5351_fpga_for_MACHXO2_2000/impl1/source/dividers1.v=S
+C:\lscc\diamond\3.10_x64\active-hdl\vlib\ovi_machxo2/src/GSR.v=S
+C:\lscc\diamond\3.10_x64\active-hdl\vlib\ovi_machxo2/src/PUR.v=S
+D:\Users\Chirikalo\Lattice_proj\DKS-5351_fpga_for_MACHXO2_2000/impl1/source/testbench.v=S

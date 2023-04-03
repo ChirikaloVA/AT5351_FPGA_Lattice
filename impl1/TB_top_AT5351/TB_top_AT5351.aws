@@ -1,0 +1,12 @@
+[Version]
+Version=10.3
+[Designs]
+aldec_tb_at5351_top=.\ALDEC_TB_AT5351_top\ALDEC_TB_AT5351_top.adf
+[Browser]
+sort=order
+mode=none
+[Order]
+order=1
+macro=
+[Expand]
+aldec_tb_at5351_top=1
